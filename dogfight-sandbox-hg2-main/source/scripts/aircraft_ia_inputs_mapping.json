@@ -1,0 +1,22 @@
+{"AircraftIAInputsMapping":
+	{
+		"Keyboard":{
+			"ACTIVATE_USER_CONTROL": "K_U"
+		},
+		"Xbox Controller":{
+			"ACTIVATE_USER_CONTROL": "GB_RightThumb"
+		},
+		"Logitech Attack 3":
+		{
+			"ACTIVATE_USER_CONTROL": "LA3B_TopHead"
+		},
+		"Wired Gamepad":
+		{
+			"ACTIVATE_USER_CONTROL": "WGPB_RThumb"
+		},
+		"USB Game Controllers":
+		{
+			"ACTIVATE_USER_CONTROL": ""
+		}
+	}
+}

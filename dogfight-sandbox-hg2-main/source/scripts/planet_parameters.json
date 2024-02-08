@@ -1,0 +1,91 @@
+{
+    "space_color": [
+        0.025569908320903778,
+        0.014096646569669247,
+        0.04424780607223511,
+        1.0
+    ],
+    "high_atmosphere_color": [
+        0.14263059198856354,
+        0.35415351390838623,
+        0.6858407258987427,
+        1.0
+    ],
+    "high_atmosphere_pos": 0.7129999995231628,
+    "low_atmosphere_color": [
+        0.5,
+        0.7610757350921631,
+        1.0,
+        1.0
+    ],
+    "low_atmosphere_pos": 0.3580000102519989,
+    "horizon_line_color": [
+        0.8451327085494995,
+        0.9671134948730469,
+        1.0,
+        1.0
+    ],
+    "horizon_line_pos": 0.4580000042915344,
+    "horizon_line_falloff": 0.3580000102519989,
+    "horizon_low_line_falloff": 0.25,
+    "horizon_low_line_size": 0.15199999511241913,
+    "tex_sky_intensity": 0.4779999852180481,
+    "tex_space_intensity": 1.0,
+    "clouds_scale": [
+        50000.0,
+        0.11699999868869781,
+        40000.0
+    ],
+    "clouds_altitude": 3000.0,
+    "clouds_absorption": 0.19099999964237213,
+    "sea_color": [
+        0.040195532143116,
+        0.03066018410027027,
+        0.07964599132537842,
+        1.0
+    ],
+    "underwater_color": [
+        0.10445220023393631,
+        0.15854360163211823,
+        0.24336284399032593,
+        1.0
+    ],
+    "reflect_color": [
+        0.23696063458919525,
+        0.30851200222969055,
+        0.5884956121444702,
+        1.0
+    ],
+    "sea_reflection": 1.0,
+    "sea_scale": [
+        0.009999999776482582,
+        14.0,
+        0.00800000037997961
+    ],
+    "reflect_offset": 66.1520004272461,
+    "scene_reflect": 1,
+    "sun_size": 0.41499999165534973,
+    "sun_smooth": 0.7599999904632568,
+    "sun_glow": 1.0,
+    "sun_space_glow_intensity": 0.5149999856948853,
+    "terrain_intensity": 0.7540000081062317,
+    "terrain_scale": [
+        41480.0,
+        1.0,
+        19587.0
+    ],
+    "terrain_clamp": 0.020999999716877937,
+    "terrain_coast_edges": [
+        0.1509999930858612,
+        0.1770000010728836
+    ],
+    "terrain_position": [
+        -24896.0,
+        0.0,
+        9443.0
+    ],
+    "planet_radius": 6000000.0,
+    "atmosphere_thickness": 50000.0,
+    "atmosphere_falloff": 0.26499998569488525,
+    "atmosphere_luminosity_falloff": 0.2750000059604645
+}

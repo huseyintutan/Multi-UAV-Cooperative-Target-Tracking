@@ -1,0 +1,2 @@
+tqdm
+harfang==3.2.5
