@@ -1,13 +1,9 @@
 
-# Dogfight Sandbox client example
-# This script show how to use the network mode to controls aircrafts.
-# Before starts this script, Dogfight Sandbox must be running in "Network mode"
-# dogfight_client.py is the library needed to communicate with DogFight sandbox
+# Written by @HuseyinTutan 2024
 
 import dogfight_client as df
 import time
 
-# Print fps function, to check the network client frequency.
 
 t = 0
 t0 = 0
@@ -34,7 +30,7 @@ print(str(planes))
 df.disable_log()
 
 # Get the id of the plane you want to control
-plane_id = planes[0]
+plane_id = planes[3]
 
 # Reset the plane at its start state
 df.reset_machine(plane_id)
@@ -51,8 +47,8 @@ while t < 1:
 	plane_state = df.get_plane_state(plane_id)
 	# Display text & vector - !!! Must be called before update_scene() !!!
 	# !!! Display text & vector only works in Client Update Mode !!!
-	df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
-	df.display_vector(plane_state["position"], plane_state["move_vector"], "Linear speed: " + str(plane_state["linear_speed"]), [0, 0.02], [0, 1, 0, 1], 0.02)
+	# df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
+	# df.display_vector(plane_state["position"], plane_state["move_vector"], "Linear speed: " + str(plane_state["linear_speed"]), [0, 0.02], [0, 1, 0, 1], 0.02)
 	# Update frame:
 	df.update_scene()
 	#print_fps()
@@ -70,10 +66,10 @@ p = 0
 while p < 15:
 	# Timer to 1/20 s.
 	# As Client update mode is ON, the renderer runs to 20 FPS until pitch >= 15°
-	time.sleep(1/20)
+	time.sleep(1/200)
 	plane_state = df.get_plane_state(plane_id)
-	df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
-	df.display_vector(plane_state["position"], plane_state["move_vector"], "Linear speed: " + str(plane_state["linear_speed"]), [0, 0.02], [0, 1, 0, 1], 0.02)
+	# df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
+	# df.display_vector(plane_state["position"], plane_state["move_vector"], "Linear speed: " + str(plane_state["linear_speed"]), [0, 0.02], [0, 1, 0, 1], 0.02)
 	df.update_scene()
 	p = plane_state["pitch_attitude"]
 
@@ -87,8 +83,8 @@ df.retract_gear(plane_id)
 s = 0
 while s < 500 / 3.6: # Linear speed is given in m/s. To translate in km/h, just divide it by 3.6
 	plane_state = df.get_plane_state(plane_id)
-	df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
-	df.display_vector(plane_state["position"], plane_state["move_vector"], "Linear speed: " + str(plane_state["linear_speed"]), [0, 0.02], [0, 1, 0, 1], 0.02)
+	# df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
+	# df.display_vector(plane_state["position"], plane_state["move_vector"], "Linear speed: " + str(plane_state["linear_speed"]), [0, 0.02], [0, 1, 0, 1], 0.02)
 	df.update_scene()
 	# Get next physics parameters for the plane:
 	next_physics = df.compute_next_timestep_physics(plane_id, 1/60)
@@ -99,44 +95,44 @@ while s < 500 / 3.6: # Linear speed is given in m/s. To translate in km/h, just 
 df.deactivate_post_combustion(plane_id)
 
 # Set Renderless mode ON
-df.set_renderless_mode(True)
+# df.set_renderless_mode(True)
 
 # Wait while Renderless mode setting up:
-f = False
-while not f:
-	f = df.get_running()["running"]
+# f = False
+# while not f:
+# 	f = df.get_running()["running"]
 
-print("RenderLess running")
+# print("RenderLess running")
 
 # Wait until plane altitude >= 5000 m
 a = 0
 
-while a < 5000:
+while a < 500:
 	print_fps()
-	df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
+	# df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
 	df.update_scene()
 	plane_state = df.get_plane_state(plane_id)
 	a = plane_state["altitude"]
 
 # When cruising speed & altitude are OK, setups and starts the autopilot
-df.set_plane_autopilot_altitude(plane_id, 200)
-df.set_plane_autopilot_heading(plane_id, 360-90)
-df.set_plane_autopilot_speed(plane_id, 500 / 3.6)
+df.set_plane_autopilot_altitude(plane_id, 500)
+df.set_plane_autopilot_heading(plane_id, 360-0)
+df.set_plane_autopilot_speed(plane_id, 400 )
 df.activate_autopilot(plane_id)
 
 # Renderless mode OFF
-df.set_renderless_mode(False)
+# df.set_renderless_mode(False)
 
 # Wait while Renderless mode setting up
-f = False
-while not f:
-	f = df.get_running()["running"]
+# f = False
+# while not f:
+# 	f = df.get_running()["running"]
 
 # Client update mode OFF
 df.set_client_update_mode(False)
 
 # Disconnect from the Dogfight server
 
-df.disconnect()
+#df.disconnect()
 
 

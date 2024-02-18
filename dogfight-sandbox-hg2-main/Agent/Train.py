@@ -10,7 +10,7 @@ from statistics import mean
 from HarfangEnv_GYM import *
 import dogfight_client as df
 
-df.connect("192.168.1.28", 50888) #TODO:Change IP and PORT values
+df.connect("192.168.56.1", 50888) #TODO:Change IP and PORT values
 
 start = time.time() #STARTING TIME
 df.disable_log() 

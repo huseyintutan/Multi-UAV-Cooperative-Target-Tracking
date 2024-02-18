@@ -225,12 +225,12 @@ def menu_state(dts):
 
         yof7 = -0.1 
 
-        Overlays.add_text2D("DOGFIGHT SANDBOX & SWARMTRACK ", hg.Vec2(0.5, 800 / 900 - 0.08), 0.035, hg.Color.White * f, Main.title_font, hg.DTHA_Center)
-        Overlays.add_text2D("Huseyin Tutan", hg.Vec2(0.5, 770 / 900 - 0.08), 0.025, hg.Color.White * f, Main.hud_font, hg.DTHA_Center)
+        Overlays.add_text2D("MULTI - UAV COOPERATIVE TARGET TRACKING ", hg.Vec2(0.5, 800 / 900 - 0.08), 0.035, hg.Color.White * f, Main.hud_font, hg.DTHA_Center)
+        Overlays.add_text2D("110190021 - Huseyin Tutan - ITU FAA - UCK4902", hg.Vec2(0.5, 770 / 900 - 0.08), 0.025, hg.Color.White * f, Main.hud_font, hg.DTHA_Center)
 
         Missions.display_mission_title(Main, f, dts, yof7)
 
-        Overlays.add_text2D("Choose network mode then run swarm.py script", hg.Vec2(0.5, 611 / 900 + yof7), 0.025, hg.Color(1, 1, 1, (0.7 + sin(tps * 5) * 0.3)) * f, Main.title_font, hg.DTHA_Center)
+        Overlays.add_text2D("Choose network mode then run python script.", hg.Vec2(0.5, 611 / 900 + yof7), 0.025, hg.Color(1, 1, 1, (0.7 + sin(tps * 5) * 0.3)) * f, Main.hud_font, hg.DTHA_Center)
 
         # Number of colmuns for commands display
         n_col = 1
@@ -241,53 +241,54 @@ def menu_state(dts):
         w = x_step_cmds + n_col * x_step
         x_start = 0.5 - (w/2)
 
-        s = 0.015
-        x = x_start
-        y = 500 + yof7 * 900
-        c = hg.Color(1., 0.9, 0.3, 1) * f
-        if Main.flag_vr:
-            Overlays.add_text2D(Main.inputs_commands["display_order"][0], hg.Vec2(x, (y+20) / 900), s, c, Main.hud_font)
-        stp = 0
-        for i in range(1,len(Main.inputs_commands["display_order"])):
-            Overlays.add_text2D(Main.inputs_commands["display_order"][i], hg.Vec2(x, (y - stp) / 900), s, c, Main.hud_font)
-            stp += 20
+        # s = 0.015
+        # x = x_start
+        # y = 500 + yof7 * 900
+        # c = hg.Color(1., 0.9, 0.3, 1) * f
+        # if Main.flag_vr:
+        #     Overlays.add_text2D(Main.inputs_commands["display_order"][0], hg.Vec2(x, (y+20) / 900), s, c, Main.hud_font)
+        # stp = 0
+        # for i in range(1,len(Main.inputs_commands["display_order"])):
+        #     Overlays.add_text2D(Main.inputs_commands["display_order"][i], hg.Vec2(x, (y - stp) / 900), s, c, Main.hud_font)
+        #     stp += 20
     
-        c2 = hg.Color.Grey * f
+        # c2 = hg.Color.Grey * f
 
-        x += x_step_cmds
+        # x += x_step_cmds
 
-        c = hg.Color.White * f
+        # c = hg.Color.White * f
         
         # Keyboard:
-        if Main.control_mode == ControlDevice.CM_KEYBOARD:
+        # if Main.control_mode == ControlDevice.CM_KEYBOARD:
             
-            #Overlays.add_text2D("Keyboard commands", hg.Vec2(x, (y+60) / 900), s, c2, Main.hud_font)
-            if Main.flag_vr:
-                Overlays.add_text2D(Main.inputs_commands["commands_dict"]["Recenter view"]["keyboard"], hg.Vec2(x, (y+20) / 900), s, c, Main.hud_font)
-            stp = 0
-            for i in range(1, len(Main.inputs_commands["display_order"])):
-                command_name = Main.inputs_commands["display_order"][i]
-                command = Main.inputs_commands["commands_dict"][command_name]
-                if "keyboard" in command:
-                    Overlays.add_text2D(command["keyboard"], hg.Vec2(x, (y - stp) / 900), s, c, Main.hud_font)
-                stp += 20
+        #     #Overlays.add_text2D("Keyboard commands", hg.Vec2(x, (y+60) / 900), s, c2, Main.hud_font)
+        #     if Main.flag_vr:
+        #         Overlays.add_text2D(Main.inputs_commands["commands_dict"]["Recenter view"]["keyboard"], hg.Vec2(x, (y+20) / 900), s, c, Main.hud_font)
+        #     stp = 0
+        #     for i in range(1, len(Main.inputs_commands["display_order"])):
+        #         command_name = Main.inputs_commands["display_order"][i]
+        #         command = Main.inputs_commands["commands_dict"][command_name]
+        #         if "keyboard" in command:
+        #             pass
+                    # Overlays.add_text2D(command["keyboard"], hg.Vec2(x, (y - stp) / 900), s, c, Main.hud_font)
+                #stp += 20
        
         # Joystick
-        elif Main.control_mode == ControlDevice.CM_JOYSTICK:
-            #x += x_step
-            Overlays.add_text2D("Joystick commands - " + ControlDevice.get_current_joystick().GetDeviceName() + " / " + ControlDevice.get_current_joystick_name(), hg.Vec2(x, (y+60) / 900), s, c2, Main.hud_font)
-            stp = 0
-            for i in range(1, len(Main.inputs_commands["display_order"])):
-                command_name = Main.inputs_commands["display_order"][i]
-                command = Main.inputs_commands["commands_dict"][command_name]
-                if "joystick" in command:
-                    if command["joystick"] != "":
-                        Overlays.add_text2D(command["joystick"],  hg.Vec2(x, (y - stp) / 900), s, c, Main.hud_font)
-                    elif "keyboard" in command:
-                        Overlays.add_text2D("Keyboard - " + command["keyboard"], hg.Vec2(x, (y - stp) / 900), s, c * 0.8, Main.hud_font)
-                elif "keyboard" in command:
-                    Overlays.add_text2D("Keyboard - " + command["keyboard"], hg.Vec2(x, (y - stp) / 900), s, c * 0.8, Main.hud_font)
-                stp += 20
+        # elif Main.control_mode == ControlDevice.CM_JOYSTICK:
+        #     #x += x_step
+        #     Overlays.add_text2D("Joystick commands - " + ControlDevice.get_current_joystick().GetDeviceName() + " / " + ControlDevice.get_current_joystick_name(), hg.Vec2(x, (y+60) / 900), s, c2, Main.hud_font)
+        #     stp = 0
+        #     for i in range(1, len(Main.inputs_commands["display_order"])):
+        #         command_name = Main.inputs_commands["display_order"][i]
+        #         command = Main.inputs_commands["commands_dict"][command_name]
+        #         if "joystick" in command:
+        #             if command["joystick"] != "":
+        #                 Overlays.add_text2D(command["joystick"],  hg.Vec2(x, (y - stp) / 900), s, c, Main.hud_font)
+        #             elif "keyboard" in command:
+        #                 Overlays.add_text2D("Keyboard - " + command["keyboard"], hg.Vec2(x, (y - stp) / 900), s, c * 0.8, Main.hud_font)
+        #         elif "keyboard" in command:
+        #             Overlays.add_text2D("Keyboard - " + command["keyboard"], hg.Vec2(x, (y - stp) / 900), s, c * 0.8, Main.hud_font)
+        #         stp += 20
 
         if vcr.is_init():
             vcr.update(Main, Main.simulation_dt)
