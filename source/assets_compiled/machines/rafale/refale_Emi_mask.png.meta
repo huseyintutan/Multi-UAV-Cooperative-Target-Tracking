@@ -1,0 +1,9 @@
+{
+	"profiles": {
+		"default": {
+			"compression": "ETC2",
+			"mag-filter": "Anisotropic",
+			"min-filter": "Anisotropic"
+		}
+	}
+}
