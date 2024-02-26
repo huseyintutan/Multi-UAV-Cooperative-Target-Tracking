@@ -117,7 +117,7 @@ while a < 500:
 # When cruising speed & altitude are OK, setups and starts the autopilot
 df.set_plane_autopilot_altitude(plane_id, 500)
 df.set_plane_autopilot_heading(plane_id, 360-0)
-df.set_plane_autopilot_speed(plane_id, 400 )
+df.set_plane_autopilot_speed(plane_id, 300 )
 df.activate_autopilot(plane_id)
 
 # Renderless mode OFF
