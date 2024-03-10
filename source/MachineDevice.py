@@ -1398,6 +1398,7 @@ class AircraftIAControlDevice(ControlDevice):
     # ==================================== functions
 
     def activate(self):
+        print("activate running")
         if not self.activated:
             ControlDevice.activate(self)
             aircraft = self.machine
@@ -1498,6 +1499,7 @@ class AircraftIAControlDevice(ControlDevice):
                 self.update_IA_landing(aircraft, dts)
 
     def update_IA_liftoff(self, aircraft, dts):
+        print("liftoff running")
         self.IA_flag_landing_target_found = False
         aircraft.set_flaps_level(1)
         if self.flag_IA_start_liftoff:
@@ -1531,6 +1533,7 @@ class AircraftIAControlDevice(ControlDevice):
                                 self.IA_command = AircraftIAControlDevice.IA_COM_FIGHT
 
     def update_IA_idle(self, aircraft):
+        print("idle running")
         autopilot = aircraft.devices["AutopilotControlDevice"]
         if autopilot is not None:
             autopilot.set_autopilot_speed(400 / 3.6)
@@ -1562,6 +1565,7 @@ class AircraftIAControlDevice(ControlDevice):
         return distances[0]["landing_target"]
 
     def update_IA_landing(self, aircraft, dts):
+        print("landing running")
         if "AutopilotControlDevice" in aircraft.devices and aircraft.devices["AutopilotControlDevice"] is not None:
             autopilot = aircraft.devices["AutopilotControlDevice"]
             if not self.IA_flag_landing_target_found:
@@ -1643,6 +1647,7 @@ class AircraftIAControlDevice(ControlDevice):
                                         self.IA_command = AircraftIAControlDevice.IA_COM_LIFTOFF
 
     def update_IA_fight(self, aircraft, dts):
+        print("update fight running")
         autopilot = aircraft.devices["AutopilotControlDevice"]
         if autopilot is not None:
             if "Gear" in aircraft.devices and aircraft.devices["Gear"] is not None:
@@ -1709,6 +1714,7 @@ class AircraftIAControlDevice(ControlDevice):
                         aircraft.set_thrust_level(0.5)
 
     def controlled_device_hitted(self):
+        print("controlled device running")
         aircraft = self.machine
         td = aircraft.get_device("TargettingDevice")
         offenders = []
