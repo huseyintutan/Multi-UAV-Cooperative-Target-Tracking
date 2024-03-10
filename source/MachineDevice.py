@@ -1654,6 +1654,7 @@ class AircraftIAControlDevice(ControlDevice):
                 gear = aircraft.devices["Gear"]
                 if gear.activated:
                     gear.deactivate()
+                    print("Gear deactivated")
             autopilot.set_autopilot_speed(-1)
             speed = aircraft.get_linear_speed() * 3.6  # convert to km/h
             aircraft.set_brake_level(0)
@@ -1665,6 +1666,7 @@ class AircraftIAControlDevice(ControlDevice):
                     aircraft.activate_post_combustion()
                     autopilot.set_autopilot_altitude(aircraft.get_altitude())
                     autopilot.set_autopilot_heading(aircraft.heading)
+                    print("Speed correction activated")
             else:
                 self.IA_flag_speed_correction = False
                 aircraft.set_flaps_level(0)
@@ -1674,12 +1676,15 @@ class AircraftIAControlDevice(ControlDevice):
                     if self.IA_flag_position_correction:
                         if aircraft.playfield_distance < aircraft.playfield_safe_distance / 2:
                             self.IA_flag_position_correction = False
+                            print("Position correction deactivated")
+
 
                     elif self.IA_flag_altitude_correction:
                         self.IA_flag_go_to_target = False
                         autopilot.set_autopilot_altitude(self.IA_altitude_safe)
                         if self.IA_altitude_safe - 100 < alt < self.IA_altitude_safe + 100:
                             self.IA_flag_altitude_correction = False
+                            print("Altitude correction deactivated")
 
                     else:
                         target_distance = hg.Len(td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos() - aircraft.parent_node.GetTransform().GetPos())
@@ -1687,31 +1692,39 @@ class AircraftIAControlDevice(ControlDevice):
                         if target_distance < self.IA_target_distance_fight:
                             self.IA_flag_go_to_target = False
                             autopilot.set_autopilot_altitude(td.target_altitude)
+                            print("Going to target altitude")
                         else:
                             if not self.IA_flag_go_to_target:
                                 self.IA_flag_go_to_target = True
                                 aircraft.set_thrust_level(1)
                                 aircraft.activate_post_combustion()
                             autopilot.set_autopilot_altitude((td.target_altitude - alt) / 10 + alt)
+                            print("Initiating target approach")
                         if aircraft.playfield_distance > aircraft.playfield_safe_distance:
                             v = aircraft.parent_node.GetTransform().GetPos() * -1
                             self.IA_position_correction_heading = aircraft.calculate_heading(hg.Normalize(v * hg.Vec3(1, 0, 1)))
                             autopilot.set_autopilot_heading(self.IA_position_correction_heading)
                             self.IA_flag_position_correction = True
+                            print("Position correction activated")
+
 
                         if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
                             self.IA_flag_altitude_correction = True
+                            print("Altitude correction activated")
 
                 if not self.IA_flag_go_to_target:
                     if aircraft.pitch_attitude > 15:
                         aircraft.set_thrust_level(1)
                         aircraft.activate_post_combustion()
+                        print("Pitch attitude > 15, activating thrust and post combustion")
                     elif -15 < aircraft.pitch_attitude < 15:
                         aircraft.deactivate_post_combustion()
                         aircraft.set_thrust_level(1)
+                        print("Pitch attitude between -15 and 15, deactivating post combustion and activating thrust")
                     else:
                         aircraft.deactivate_post_combustion()
                         aircraft.set_thrust_level(0.5)
+                        print("Pitch attitude not in range, deactivating post combustion and setting thrust to 0.5")
 
     def controlled_device_hitted(self):
         print("controlled device running")
