@@ -131,7 +131,7 @@ hg.ImGuiInit(10, imgui_prg, imgui_img_prg)
 
 
 # --------------------- Setup dogfight sim
-#hg.AudioInit()
+hg.AudioInit()
 Main.init_game()
 
 node = Main.scene.GetNode("platform.S400")

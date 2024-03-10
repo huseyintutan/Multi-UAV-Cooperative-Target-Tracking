@@ -1697,55 +1697,6 @@ class AircraftIAControlDevice(ControlDevice):
                         if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
                             self.IA_flag_altitude_correction = True
 
-                    md = aircraft.get_device("MissilesDevice")
-
-                    # if td.target_locked:
-                    #     if md is not None:
-                    #         if self.IA_fire_missile_cptr <= 0:
-                    #             md.fire_missile()
-                    #             self.IA_fire_missile_cptr = self.IA_fire_missiles_delay
-                    #         else:
-                    #             self.IA_fire_missile_cptr -= dts
-
-                    # if td.target_angle < self.IA_gun_angle and td.target_distance < self.IA_gun_distance_max:
-                    #     n = aircraft.get_machinegun_count()
-                    #     for i in range(n):
-                    #         mgd = aircraft.get_device("MachineGunDevice_%02d" % i)
-                    #         if mgd is not None and not mgd.is_activated():
-                    #             mgd.activate()
-                    # else:
-                    #     n = aircraft.get_machinegun_count()
-                    #     for i in range(n):
-                    #         mgd = aircraft.get_device("MachineGunDevice_%02d" % i)
-                    #         if mgd is not None and mgd.is_activated():
-                    #             mgd.deactivate()
-
-                    # flag_missiles_ok = False
-                    # if md is not None:
-                    #     for missile in md.missiles:
-                    #         if missile is not None:
-                    #             flag_missiles_ok = True
-                    # else:
-                    #     flag_missiles_ok = True
-
-                    # if not flag_missiles_ok or aircraft.get_num_bullets() == 200 or aircraft.health_level < 0.33:
-                    #     self.IA_flag_landing_target_found = False
-                    #     self.IA_command = AircraftIAControlDevice.IA_COM_LANDING
-                    #     return
-
-                else:
-                    self.IA_flag_go_to_target = False
-                    n = aircraft.get_machinegun_count()
-                    for i in range(n):
-                        mgd = aircraft.get_device("MachineGunDevice_%02d" % i)
-                        if mgd is not None and mgd.is_activated():
-                            mgd.deactivate()
-                    self.IA_flag_landing_target_found = False
-                    self.IA_command = AircraftIAControlDevice.IA_COM_LANDING
-                    # self.set_autopilot_altitude(self.IA_cruising_altitude)
-                    # self.set_autopilot_heading(0)
-                # self.stop_machine_gun()
-
                 if not self.IA_flag_go_to_target:
                     if aircraft.pitch_attitude > 15:
                         aircraft.set_thrust_level(1)

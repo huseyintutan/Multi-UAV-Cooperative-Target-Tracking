@@ -28,7 +28,13 @@ planes = df.get_planes_list()
 print(str(planes))
 
 df.disable_log()
+df.activate_IA(planes[0])
 
+# İndeksi 2 olan uçağın IA modunu açma
+df.activate_IA(planes[2])
+
+# İndeksi 3 olan uçağın IA modunu açma
+df.activate_IA(planes[1])
 # Get the id of the plane you want to control
 plane_id = planes[3]
 
@@ -117,7 +123,7 @@ while a < 500:
 # When cruising speed & altitude are OK, setups and starts the autopilot
 df.set_plane_autopilot_altitude(plane_id, 500)
 df.set_plane_autopilot_heading(plane_id, 360-0)
-df.set_plane_autopilot_speed(plane_id, 300 )
+df.set_plane_autopilot_speed(plane_id, 250 )
 df.activate_autopilot(plane_id)
 
 # Renderless mode OFF
@@ -127,6 +133,14 @@ df.activate_autopilot(plane_id)
 # f = False
 # while not f:
 # 	f = df.get_running()["running"]
+# İndeksi 1 olan uçağın IA modunu açma
+df.activate_IA(planes[0])
+
+# İndeksi 2 olan uçağın IA modunu açma
+df.activate_IA(planes[2])
+
+# İndeksi 3 olan uçağın IA modunu açma
+df.activate_IA(planes[1])
 
 # Client update mode OFF
 df.set_client_update_mode(False)
