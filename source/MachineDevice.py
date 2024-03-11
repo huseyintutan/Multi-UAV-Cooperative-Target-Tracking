@@ -1691,11 +1691,11 @@ class AircraftIAControlDevice(ControlDevice):
                         autopilot.set_autopilot_heading(td.target_heading)
                         print(target_distance)
                         if target_distance < self.IA_target_distance_fight:
-                            if target_distance < 2000:
-                                print("Close target")
-                                autopilot.set_autopilot_altitude(500)
-                                autopilot.set_autopilot_heading(360-0)
-                                autopilot.set_autopilot_speed(250)
+                            # if target_distance < 2000:
+                            #     print("Close target")
+                            #     autopilot.set_autopilot_altitude(500)
+                            #     autopilot.set_autopilot_heading(360-0)
+                            #     autopilot.set_autopilot_speed(250)
                             self.IA_flag_go_to_target = False
                             autopilot.set_autopilot_altitude(td.target_altitude)
                             print("Going to target altitude")
@@ -1725,7 +1725,7 @@ class AircraftIAControlDevice(ControlDevice):
                         print("Pitch attitude > 15, activating thrust and post combustion")
                     elif -15 < aircraft.pitch_attitude < 15:
                         aircraft.deactivate_post_combustion()
-                        #aircraft.set_thrust_level(1)
+                        aircraft.set_thrust_level(1)
                         print("Pitch attitude between -15 and 15, deactivating post combustion and activating thrust")
                     else:
                         aircraft.deactivate_post_combustion()
