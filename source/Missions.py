@@ -514,11 +514,11 @@ class Missions:
 				ia.deactivate()
 
 		# ------- Missile Launcher:
-		main.create_missile_launchers(0, 1)
+		# main.create_missile_launchers(0, 1)
 
-		plateform = main.scene.GetNode("platform.S400")
-		ml = main.missile_launchers_ennemies[0]
-		ml.set_platform(plateform)
+		# plateform = main.scene.GetNode("platform.S400")
+		# ml = main.missile_launchers_ennemies[0]
+		# ml.set_platform(plateform)
 
 		# --------- Views setup
 		main.setup_views_carousel(True)
