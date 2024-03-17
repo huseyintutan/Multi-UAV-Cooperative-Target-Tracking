@@ -298,7 +298,7 @@ class HUD_Aircraft:
 			c = hg.Color.Orange
 		else:
 			c = HUD.color_inactive
-		Overlays.add_text2D("IA Activated", hg.Vec2(0.45, 0.94), 0.015, c * f, Main.hud_font)
+		Overlays.add_text2D("IA Flight", hg.Vec2(0.45, 0.94), 0.015, c * f, Main.hud_font)
 
 		# Gear HUD
 		gear = aircraft.get_device("Gear")
