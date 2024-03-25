@@ -1335,6 +1335,8 @@ class AircraftAutopilotControlDevice(ControlDevice):
                 aircraft.set_pitch_level(-tp)
 
     def update(self, dts):
+        print("update")
+
         if self.activated:
             if self.flag_user_control and self.machine.has_focus():
                 if self.control_mode == ControlDevice.CM_KEYBOARD:
@@ -1399,6 +1401,7 @@ class AircraftIAControlDevice(ControlDevice):
 
     def activate(self):
         print("activate running")
+
         if not self.activated:
             ControlDevice.activate(self)
             aircraft = self.machine
@@ -1431,6 +1434,7 @@ class AircraftIAControlDevice(ControlDevice):
                     ap_ctrl.set_autopilot_altitude(aircraft.get_altitude())
 
     def deactivate(self):
+        print("deactivate")
         if self.activated:
             ControlDevice.deactivate(self)
             aircraft = self.machine
@@ -1462,6 +1466,8 @@ class AircraftIAControlDevice(ControlDevice):
         return landing_target.get_position(d)
 
     def calculate_landing_approach_factor(self, landing_target: LandingTarget, landing_projection: hg.Vec3):
+        print("calculate_landing_approach_factor running")
+
         o = landing_target.get_landing_position()
         v = landing_projection - o
         vh = hg.Vec2(v.x, v.z)
@@ -1472,6 +1478,7 @@ class AircraftIAControlDevice(ControlDevice):
         return dist / landing_target.horizontal_amplitude
 
     def calculate_landing_target_point(self, aircraft, landing_target, landing_proj):
+        print("landing target point running")
         fit_distance = aircraft.get_linear_speed() * 0.5 * 3.6
         o = landing_target.get_landing_position()
         o = hg.Vec2(o.x, o.z)
@@ -1487,6 +1494,8 @@ class AircraftIAControlDevice(ControlDevice):
             return landing_proj
 
     def update_controlled_device(self, dts):
+        print("update controlled device running")
+
         aircraft = self.machine
         if not aircraft.wreck and not aircraft.flag_going_to_takeoff_position:
             if self.IA_command == AircraftIAControlDevice.IA_COM_IDLE:
@@ -1647,7 +1656,7 @@ class AircraftIAControlDevice(ControlDevice):
                                         self.IA_command = AircraftIAControlDevice.IA_COM_LIFTOFF
 
     def update_IA_fight(self, aircraft, dts):
-        print("update fight running")
+        #print("update fight running")
         autopilot = aircraft.devices["AutopilotControlDevice"]
         if autopilot is not None:
             if "Gear" in aircraft.devices and aircraft.devices["Gear"] is not None:
@@ -1689,21 +1698,22 @@ class AircraftIAControlDevice(ControlDevice):
                     else:
                         target_distance = hg.Len(td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos() - aircraft.parent_node.GetTransform().GetPos())
                         autopilot.set_autopilot_heading(td.target_heading)
-                        print(target_distance)
+                        #print(target_distance)
                         if target_distance < self.IA_target_distance_fight:
-                            # if target_distance < 2000:
-                            #     print("Close target")
-                            #     autopilot.set_autopilot_altitude(500)
-                            #     autopilot.set_autopilot_heading(360-0)
-                            #     autopilot.set_autopilot_speed(250)
                             self.IA_flag_go_to_target = False
                             autopilot.set_autopilot_altitude(td.target_altitude)
                             print("Going to target altitude")
                         else:
                             if not self.IA_flag_go_to_target:
                                 self.IA_flag_go_to_target = True
-                                aircraft.set_thrust_level(1)
-                                aircraft.activate_post_combustion()
+                                # if target_distance > 2000:
+                                #     print("2000üstü")
+                                #     aircraft.set_thrust_level(1)
+                                #     aircraft.activate_post_combustion()
+                                # elif target_distance < 2000:
+                                #     print("2000altı")
+                                #     aircraft.set_thrust_level(0.5)
+                                #     aircraft.deactivate_post_combustion()
                             autopilot.set_autopilot_altitude((td.target_altitude - alt) / 10 + alt)
                             print("Initiating target approach")
                         if aircraft.playfield_distance > aircraft.playfield_safe_distance:
@@ -1713,24 +1723,9 @@ class AircraftIAControlDevice(ControlDevice):
                             self.IA_flag_position_correction = True
                             print("Position correction activated")
 
-
                         if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
                             self.IA_flag_altitude_correction = True
                             print("Altitude correction activated")
-
-                if not self.IA_flag_go_to_target:
-                    if aircraft.pitch_attitude > 15:
-                        aircraft.set_thrust_level(1)
-                        aircraft.activate_post_combustion()
-                        print("Pitch attitude > 15, activating thrust and post combustion")
-                    elif -15 < aircraft.pitch_attitude < 15:
-                        aircraft.deactivate_post_combustion()
-                        aircraft.set_thrust_level(1)
-                        print("Pitch attitude between -15 and 15, deactivating post combustion and activating thrust")
-                    else:
-                        aircraft.deactivate_post_combustion()
-                        aircraft.set_thrust_level(0.5)
-                        print("Pitch attitude not in range, deactivating post combustion and setting thrust to 0.5")
 
     def controlled_device_hitted(self):
         print("controlled device running")
