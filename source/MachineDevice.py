@@ -1675,7 +1675,7 @@ class AircraftIAControlDevice(ControlDevice):
                     aircraft.activate_post_combustion()
                     autopilot.set_autopilot_altitude(aircraft.get_altitude())
                     autopilot.set_autopilot_heading(aircraft.heading)
-                    print("Speed correction activated")
+                    #print("Speed correction activated")
             else:
                 self.IA_flag_speed_correction = False
                 aircraft.set_flaps_level(0)
@@ -1685,7 +1685,7 @@ class AircraftIAControlDevice(ControlDevice):
                     if self.IA_flag_position_correction:
                         if aircraft.playfield_distance < aircraft.playfield_safe_distance / 2:
                             self.IA_flag_position_correction = False
-                            print("Position correction deactivated")
+                            #print("Position correction deactivated")
 
 
                     elif self.IA_flag_altitude_correction:
@@ -1693,7 +1693,7 @@ class AircraftIAControlDevice(ControlDevice):
                         autopilot.set_autopilot_altitude(self.IA_altitude_safe)
                         if self.IA_altitude_safe - 100 < alt < self.IA_altitude_safe + 100:
                             self.IA_flag_altitude_correction = False
-                            print("Altitude correction deactivated")
+                            #print("Altitude correction deactivated")
 
                     else:
                         target_distance = hg.Len(td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos() - aircraft.parent_node.GetTransform().GetPos())
@@ -1702,7 +1702,10 @@ class AircraftIAControlDevice(ControlDevice):
                         if target_distance < self.IA_target_distance_fight:
                             self.IA_flag_go_to_target = False
                             autopilot.set_autopilot_altitude(td.target_altitude)
-                            print("Going to target altitude")
+                            pos = aircraft.parent_node.GetTransform().GetPos()
+                            print("x:", pos.x, "y:", pos.y, "z:", pos.z)
+
+
                             if target_distance > 2000:
                                 print("2000 üstü")
                                 aircraft.set_thrust_level(1)
@@ -1724,13 +1727,13 @@ class AircraftIAControlDevice(ControlDevice):
                                 #     aircraft.set_thrust_level(0.5)
                                 #     aircraft.deactivate_post_combustion()
                             autopilot.set_autopilot_altitude((td.target_altitude - alt) / 10 + alt)
-                            print("Initiating target approach")
+                            #print("Initiating target approach")
                         if aircraft.playfield_distance > aircraft.playfield_safe_distance:
                             v = aircraft.parent_node.GetTransform().GetPos() * -1
                             self.IA_position_correction_heading = aircraft.calculate_heading(hg.Normalize(v * hg.Vec3(1, 0, 1)))
                             autopilot.set_autopilot_heading(self.IA_position_correction_heading)
                             self.IA_flag_position_correction = True
-                            print("Position correction activated")
+                            #print("Position correction activated")
 
                         if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
                             self.IA_flag_altitude_correction = True
@@ -1751,42 +1754,6 @@ class AircraftIAControlDevice(ControlDevice):
             if len(offenders) > 1:
                 offenders.sort(key=lambda p: p[1])
             td.set_target_id(offenders[0][0])
-
-    def calculate_target_projection(aircraft, target_aircraft):
-        # Mevcut uçağın konumu
-        aircraft_pos = aircraft.parent_node.GetTransform().GetPos()
-        # Hedef uçağın konumu
-        target_pos = target_aircraft.get_parent_node().GetTransform().GetPos()
-        # Hedef uçağa doğru olan vektörü hesapla
-        target_vector = target_pos - aircraft_pos
-        return target_vector
-
-    def calculate_target_approach_factor(target_projection):
-        # Hedef vektörü normalleştir
-        target_vector_normalized = hg.Normalize(target_projection)
-        # İstenirse başka hesaplamalar yapılabilir
-        return target_vector_normalized
-
-    def calculate_target_point(aircraft, target_projection):
-        # Mevcut uçağın konumu
-        aircraft_pos = aircraft.parent_node.GetTransform().GetPos()
-        # Hedef noktayı hesapla
-        target_point = aircraft_pos + target_projection
-        return target_point
-
-    def update_target_tracking(aircraft, target_aircraft, dts):
-        # Mevcut uçağın konumu
-        aircraft_pos = aircraft.parent_node.GetTransform().GetPos()
-        # Hedef uçağın konumu
-        target_pos = target_aircraft.get_parent_node().GetTransform().GetPos()
-        # Hedef uçağı takip etmek için vektörü hesapla
-        target_projection = calculate_target_projection(aircraft, target_aircraft)
-        # Hedef uçağa yaklaşım faktörünü hesapla
-        target_f = calculate_target_approach_factor(target_projection)
-        # Hedef noktayı hesapla
-        target_point = calculate_target_point(aircraft, target_projection)
-    
-z
 
     # =============================== Keyboard commands ====================================
 
