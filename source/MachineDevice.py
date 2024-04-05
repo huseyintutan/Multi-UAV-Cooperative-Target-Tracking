@@ -6,6 +6,7 @@ from math import radians, degrees, pi, sqrt, exp, floor, acos, asin, sin, cos
 from random import uniform
 from Particles import *
 import data_converter as dc
+import numpy as np
 
 # =====================================================================================================
 #                                  Landing
@@ -1656,7 +1657,7 @@ class AircraftIAControlDevice(ControlDevice):
                                         self.IA_command = AircraftIAControlDevice.IA_COM_LIFTOFF
 
     def update_IA_fight(self, aircraft, dts):
-        #print("update fight running")
+        td = aircraft.get_device("TargettingDevice")
         autopilot = aircraft.devices["AutopilotControlDevice"]
         if autopilot is not None:
             if "Gear" in aircraft.devices and aircraft.devices["Gear"] is not None:
@@ -1680,7 +1681,6 @@ class AircraftIAControlDevice(ControlDevice):
                 self.IA_flag_speed_correction = False
                 aircraft.set_flaps_level(0)
                 alt = aircraft.get_altitude()
-                td = aircraft.get_device("TargettingDevice")
                 if td.target_id > 0:
                     if self.IA_flag_position_correction:
                         if aircraft.playfield_distance < aircraft.playfield_safe_distance / 2:
@@ -1702,42 +1702,52 @@ class AircraftIAControlDevice(ControlDevice):
                         if target_distance < self.IA_target_distance_fight:
                             self.IA_flag_go_to_target = False
                             autopilot.set_autopilot_altitude(td.target_altitude)
-                            pos = aircraft.parent_node.GetTransform().GetPos()
-                            print("x:", pos.x, "y:", pos.y, "z:", pos.z)
+                            ally_pos = aircraft.parent_node.GetTransform().GetPos()
+                            target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
+                            estimated_vector = np.subtract(target_pos,ally_pos)
+                            print("x:", estimated_vector.x, "y:", estimated_vector.y, "z:", estimated_vector.z)
+                            
+                            x_component = estimated_vector.x
+                            y_component = estimated_vector.y
+                            z_component = estimated_vector.z
+                            ##### These functions should be moved in other function file
+                            ###########################   YAW CALCULATION   ######################################
+                            yaw_angle = np.arctan2(z_component, x_component)
 
+                            if yaw_angle < -np.pi:
+                                yaw_angle += 2 * np.pi
+                            elif yaw_angle > np.pi:
+                                yaw_angle -= 2 * np.pi
+                            yaw_level = yaw_angle / np.pi
 
-                            if target_distance > 2000:
-                                print("2000 üstü")
-                                aircraft.set_thrust_level(1)
-                                aircraft.activate_post_combustion()
-                            elif target_distance < 2000:
-                                print("2000 altı")
-                                #aircraft.set_thrust_level(0.35)
-                                aircraft.deactivate_post_combustion()
-                                autopilot.set_autopilot_speed(360)
+                            ############################   ROLL CALCULATION   ####################################
+                            roll_level = y_component / np.linalg.norm(estimated_vector)
+
+                            ############################   PITCH CALCULATION  ####################################
+                            y_component = estimated_vector.y
+    
+                            pitch_level = y_component / np.linalg.norm(estimated_vector)
+
+                            aircraft.set_yaw_level(yaw_level)
+                            aircraft.set_roll_level(roll_level)
+                            aircraft.set_pitch_level(pitch_level)
+
+                            aircraft.set_thrust_level(1)
+                            aircraft.activate_post_combustion()
+
                         else:
                             if not self.IA_flag_go_to_target:
                                 self.IA_flag_go_to_target = True
-                                # if target_distance > 2000:
-                                #     print("2000üstü")
-                                #     aircraft.set_thrust_level(1)
-                                #     aircraft.activate_post_combustion()
-                                # elif target_distance < 2000:
-                                #     print("2000altı")
-                                #     aircraft.set_thrust_level(0.5)
-                                #     aircraft.deactivate_post_combustion()
                             autopilot.set_autopilot_altitude((td.target_altitude - alt) / 10 + alt)
-                            #print("Initiating target approach")
                         if aircraft.playfield_distance > aircraft.playfield_safe_distance:
                             v = aircraft.parent_node.GetTransform().GetPos() * -1
                             self.IA_position_correction_heading = aircraft.calculate_heading(hg.Normalize(v * hg.Vec3(1, 0, 1)))
                             autopilot.set_autopilot_heading(self.IA_position_correction_heading)
                             self.IA_flag_position_correction = True
-                            #print("Position correction activated")
 
                         if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
                             self.IA_flag_altitude_correction = True
-                            print("Altitude correction activated")
+
 
     def controlled_device_hitted(self):
         print("controlled device running")
