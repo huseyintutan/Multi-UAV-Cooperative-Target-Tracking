@@ -1336,7 +1336,7 @@ class AircraftAutopilotControlDevice(ControlDevice):
                 aircraft.set_pitch_level(-tp)
 
     def update(self, dts):
-        print("update")
+        #print("update")
 
         if self.activated:
             if self.flag_user_control and self.machine.has_focus():
@@ -1495,7 +1495,7 @@ class AircraftIAControlDevice(ControlDevice):
             return landing_proj
 
     def update_controlled_device(self, dts):
-        print("update controlled device running")
+        #print("update controlled device running")
 
         aircraft = self.machine
         if not aircraft.wreck and not aircraft.flag_going_to_takeoff_position:
@@ -1656,6 +1656,7 @@ class AircraftIAControlDevice(ControlDevice):
                                         self.IA_liftoff_delay = 2
                                         self.IA_command = AircraftIAControlDevice.IA_COM_LIFTOFF
 
+
     def update_IA_fight(self, aircraft, dts):
         td = aircraft.get_device("TargettingDevice")
         autopilot = aircraft.devices["AutopilotControlDevice"]
@@ -1687,66 +1688,58 @@ class AircraftIAControlDevice(ControlDevice):
                             self.IA_flag_position_correction = False
                             #print("Position correction deactivated")
 
-
                     elif self.IA_flag_altitude_correction:
                         self.IA_flag_go_to_target = False
                         autopilot.set_autopilot_altitude(self.IA_altitude_safe)
                         if self.IA_altitude_safe - 100 < alt < self.IA_altitude_safe + 100:
                             self.IA_flag_altitude_correction = False
                             #print("Altitude correction deactivated")
-
                     else:
-                        target_distance = hg.Len(td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos() - aircraft.parent_node.GetTransform().GetPos())
-                        autopilot.set_autopilot_heading(td.target_heading)
-                        #print(target_distance)
-                        if target_distance < self.IA_target_distance_fight:
-                            self.IA_flag_go_to_target = False
-                            autopilot.set_autopilot_altitude(td.target_altitude)
-                            ally_pos = aircraft.parent_node.GetTransform().GetPos()
-                            target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
-                            estimated_vector = np.subtract(target_pos,ally_pos)
-                            print("x:", estimated_vector.x, "y:", estimated_vector.y, "z:", estimated_vector.z)
-                            
-                            x_component = estimated_vector.x
-                            y_component = estimated_vector.y
-                            z_component = estimated_vector.z
-                            ##### These functions should be moved in other function file
-                            ###########################   YAW CALCULATION   ######################################
-                            yaw_angle = np.arctan2(z_component, x_component)
+                        ally_pos = aircraft.parent_node.GetTransform().GetPos()
+                        target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
 
-                            if yaw_angle < -np.pi:
-                                yaw_angle += 2 * np.pi
-                            elif yaw_angle > np.pi:
-                                yaw_angle -= 2 * np.pi
-                            yaw_level = yaw_angle / np.pi
+                        # İki nokta arasındaki vektörü hesapla
+                        vector_x = target_pos.x - ally_pos.x
+                        vector_z = target_pos.z - ally_pos.z
 
-                            ############################   ROLL CALCULATION   ####################################
-                            roll_level = y_component / np.linalg.norm(estimated_vector)
+                        # Vektörün büyüklüğünü (norm) hesapla
+                        vector_norm = np.sqrt(vector_x ** 2 + vector_z ** 2)
 
-                            ############################   PITCH CALCULATION  ####################################
-                            y_component = estimated_vector.y
-    
-                            pitch_level = y_component / np.linalg.norm(estimated_vector)
+                        # Vektörü normalleştir (birim vektör)
+                        unit_vector_x = vector_x / vector_norm
+                        unit_vector_z = vector_z / vector_norm
 
-                            aircraft.set_yaw_level(yaw_level)
-                            aircraft.set_roll_level(roll_level)
-                            aircraft.set_pitch_level(pitch_level)
+                        # Yönü hesapla
+                        heading_radians = np.arctan2(unit_vector_x, unit_vector_z)
+                        heading_degrees = np.degrees(heading_radians)
 
-                            aircraft.set_thrust_level(1)
-                            aircraft.activate_post_combustion()
+                        # Açıyı 0 ile 360 arasında normalleştir
+                        if heading_degrees < 0:
+                            heading_degrees += 360
+                        elif heading_degrees >= 360:
+                            heading_degrees -= 360
 
-                        else:
-                            if not self.IA_flag_go_to_target:
-                                self.IA_flag_go_to_target = True
-                            autopilot.set_autopilot_altitude((td.target_altitude - alt) / 10 + alt)
-                        if aircraft.playfield_distance > aircraft.playfield_safe_distance:
-                            v = aircraft.parent_node.GetTransform().GetPos() * -1
-                            self.IA_position_correction_heading = aircraft.calculate_heading(hg.Normalize(v * hg.Vec3(1, 0, 1)))
-                            autopilot.set_autopilot_heading(self.IA_position_correction_heading)
-                            self.IA_flag_position_correction = True
+                        print("Heading:", heading_degrees)
 
-                        if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
-                            self.IA_flag_altitude_correction = True
+                        #print("x:", estimated_vector.x, "y:", estimated_vector.y, "z:", estimated_vector.z)
+                        autopilot.set_autopilot_speed(500)
+                        autopilot.set_autopilot_heading(heading_degrees)
+                        
+
+                        # aircraft.set_thrust_level(0.5)
+                        # aircraft.activate_post_combustion()
+
+                        if not self.IA_flag_go_to_target:
+                            self.IA_flag_go_to_target = True
+                        autopilot.set_autopilot_altitude((td.target_altitude - alt) / 10 + alt)
+                    if aircraft.playfield_distance > aircraft.playfield_safe_distance:
+                        v = aircraft.parent_node.GetTransform().GetPos() * -1
+                        self.IA_position_correction_heading = aircraft.calculate_heading(hg.Normalize(v * hg.Vec3(1, 0, 1)))
+                        autopilot.set_autopilot_heading(self.IA_position_correction_heading)
+                        self.IA_flag_position_correction = True
+
+                    if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
+                        self.IA_flag_altitude_correction = True
 
 
     def controlled_device_hitted(self):
