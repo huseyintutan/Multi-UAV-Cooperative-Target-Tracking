@@ -488,6 +488,8 @@ class Destroyable_Machine(AnimatedModel):
                 Destroyable_Machine.update_list.pop(i)
                 break
 
+
+
     def update_view_v_move(self, dts):
         if self.mat_view_prec is None or self.mat_view is None:
             self.view_v_move.x, self.view_v_move.y, self.view_v_move.z = 0, 0, 0
@@ -1305,9 +1307,12 @@ class Aircraft(Destroyable_Machine):
     user_inputs_mapping_file = "scripts/aircraft_user_inputs_mapping.json"
     autopilot_inputs_mapping_file = "scripts/aircraft_autopilot_inputs_mapping.json"
     ia_inputs_mapping_file = "scripts/aircraft_ia_inputs_mapping.json"
+    total_aircrafts = 0
+
 
     def __init__(self, name, model_name, scene, scene_physics, pipeline_ressource: hg.PipelineResources, instance_scene_name, nationality, start_position, start_rotation):
-
+        self.id = Aircraft.total_aircrafts
+        Aircraft.total_aircrafts += 1
         Destroyable_Machine.__init__(self, name, model_name, scene, scene_physics, pipeline_ressource, instance_scene_name, Destroyable_Machine.TYPE_AIRCRAFT, nationality, start_position, start_rotation)
         self.commands.update({"SET_THRUST_LEVEL": self.set_thrust_level,
                               "SET_BRAKE_LEVEL": self.set_brake_level,

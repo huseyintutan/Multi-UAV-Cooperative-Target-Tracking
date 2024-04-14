@@ -56,7 +56,7 @@ class Missions:
 	am_t = 0
 
 	missions = []
-	mission_id = 1
+	mission_id = 0
 
 	@classmethod
 	def display_mission_title(cls, main, fade_lvl, dts, yof7):
@@ -585,7 +585,7 @@ class Missions:
 		cls.missions.append(Mission("Network mode", ["Eurofighter"]*4, ["Rafale"]*4, 1, 1, Missions.network_mode_setup, Missions.network_mode_end_test, Missions.network_mode_end_phase_update))
 		# cls.missions.append(Mission("Training with Rafale", [], ["Rafale"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
 		# cls.missions.append(Mission("Training with Eurofighter", [], ["Eurofighter"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
-		cls.missions.append(Mission("Training with TFX", [], ["TFX"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
+		#cls.missions.append(Mission("Training with TFX", [], ["TFX"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
 		# cls.missions.append(Mission("Training with F16", [], ["F16"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
 		# cls.missions.append(Mission("Training with Miuss", [], ["Miuss"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
 		#cls.missions.append(Mission("Training with F14", [], ["F14"], 0, 1, Missions.mission_setup_training, Missions.mission_training_end_test, Missions.mission_training_end_phase_update))
