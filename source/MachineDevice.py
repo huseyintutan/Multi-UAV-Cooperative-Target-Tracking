@@ -1383,10 +1383,10 @@ class AircraftIAControlDevice(ControlDevice):
         self.IA_flag_go_to_target = False
         self.IA_altitude_min = 200
         self.IA_altitude_max = 8000
-        self.IA_altitude_safe = 800
+        self.IA_altitude_safe = 500
         self.IA_gun_distance_max = 1000
         self.IA_gun_angle = 10
-        self.IA_cruising_altitude = 600
+        self.IA_cruising_altitude = 500
         self.IA_command = AircraftIAControlDevice.IA_COM_IDLE
 
         self.IA_target_point = hg.Vec3(0, 0, 0)
@@ -1715,23 +1715,6 @@ class AircraftIAControlDevice(ControlDevice):
                         heading_radians = np.arctan2(unit_vector_x, unit_vector_z)
                         heading_degrees = np.degrees(heading_radians)
 
-                        # Normalize the heading
-                        # if heading_degrees < 0:
-                        #     heading_degrees += 360
-                        # elif heading_degrees >= 360:
-                        #     heading_degrees -= 360
-
-                        #print("Heading:", heading_degrees)
-
-                        # if aircraft.id == 0:  
-                        #     heading_degrees = left_heading_degrees
-                        # elif aircraft.id == 1:  
-                        #     heading_degrees = right_heading_degrees
-                        # elif aircraft.id == 2:  
-                        #     heading_degrees = back_heading_degrees
-                        # else:
-                        #     heading_degrees = left_heading_degrees  
-
                         # print("x:", estimated_vector.x, "y:", estimated_vector.y, "z:", estimated_vector.z)
 
                         diff_x = target_pos.x - ally_pos.x
@@ -1743,21 +1726,22 @@ class AircraftIAControlDevice(ControlDevice):
                         if aircraft.id == 6:  
                             ally_pos = aircraft.parent_node.GetTransform().GetPos()
                             target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
-                            left_target_pos = hg.Vec3(target_pos.x + 50, target_pos.y, target_pos.z)  
+                            left_target_pos = hg.Vec3(target_pos.x , target_pos.y, target_pos.z -100)  
                             vector_x = left_target_pos.x - ally_pos.x
                             vector_z = left_target_pos.z - ally_pos.z
                             heading_radians = np.arctan2(vector_x, vector_z)
                             heading_degrees = np.degrees(heading_radians)
+
                             if heading_degrees < 0:
                                 heading_degrees += 360
                             elif heading_degrees >= 360:
                                 heading_degrees -= 360
 
-                            if distance < 3000:
+                            if distance < 2000:
                                 autopilot.set_autopilot_altitude(td.target_altitude)
                                 autopilot.set_autopilot_heading(heading_degrees)
                                 autopilot.set_autopilot_speed(250)
-                            elif distance > 3000:
+                            elif distance > 2000:
                                 autopilot.set_autopilot_speed(500)
                                 autopilot.set_autopilot_heading(heading_degrees)
                                 autopilot.set_autopilot_altitude(td.target_altitude)
@@ -1766,20 +1750,21 @@ class AircraftIAControlDevice(ControlDevice):
                         elif aircraft.id == 7:  
                             ally_pos = aircraft.parent_node.GetTransform().GetPos()
                             target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
-                            right_target_pos = hg.Vec3(target_pos.x - 50, target_pos.y, target_pos.z)  
+                            right_target_pos = hg.Vec3(target_pos.x , target_pos.y, target_pos.z)  
                             vector_z = right_target_pos.z - ally_pos.z
                             heading_radians = np.arctan2(vector_x, vector_z)
                             heading_degrees = np.degrees(heading_radians)
+
                             if heading_degrees < 0:
                                 heading_degrees += 360
                             elif heading_degrees >= 360:
                                 heading_degrees -= 360
 
-                            if distance < 3000:
+                            if distance < 2000:
                                 autopilot.set_autopilot_altitude(td.target_altitude)
                                 autopilot.set_autopilot_heading(heading_degrees)
                                 autopilot.set_autopilot_speed(250)
-                            elif distance > 3000:
+                            elif distance > 2000:
                                 autopilot.set_autopilot_speed(500)
                                 autopilot.set_autopilot_heading(heading_degrees)
                                 autopilot.set_autopilot_altitude(td.target_altitude)
@@ -1788,38 +1773,27 @@ class AircraftIAControlDevice(ControlDevice):
                         elif aircraft.id == 8:  
                             ally_pos = aircraft.parent_node.GetTransform().GetPos()
                             target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
-                            back_target_pos = hg.Vec3(target_pos.x, target_pos.y, target_pos.z - 50)  
+                            back_target_pos = hg.Vec3(target_pos.x , target_pos.y, target_pos.z +100 )  
                             vector_x = back_target_pos.x - ally_pos.x
                             vector_z = back_target_pos.z - ally_pos.z
                             heading_radians = np.arctan2(vector_x, vector_z)
                             heading_degrees = np.degrees(heading_radians)
+
                             if heading_degrees < 0:
                                 heading_degrees += 360
                             elif heading_degrees >= 360:
                                 heading_degrees -= 360
 
-                            if distance < 3000:
+                            if distance < 2000:
                                 autopilot.set_autopilot_altitude(td.target_altitude)
                                 autopilot.set_autopilot_heading(heading_degrees)
                                 autopilot.set_autopilot_speed(250)
-                            elif distance > 3000:
+                            elif distance > 2000:
                                 autopilot.set_autopilot_speed(500)
                                 autopilot.set_autopilot_heading(heading_degrees)
                                 autopilot.set_autopilot_altitude(td.target_altitude)
                                 #print(td.target_altitude)
                                 
-
-                        #print("Distance between two planes:", distance)
-                        # if distance < 3000:
-                        #     autopilot.set_autopilot_altitude(td.target_altitude)
-                        #     autopilot.set_autopilot_heading(heading_degrees)
-                        #     autopilot.set_autopilot_speed(250)
-                        # elif distance > 3000:
-                        #     autopilot.set_autopilot_speed(500)
-                        #     autopilot.set_autopilot_heading(heading_degrees)
-                        #     autopilot.set_autopilot_altitude(td.target_altitude)
-                        #     #print(td.target_altitude)
-                            
                         # aircraft.set_thrust_level(0.5)
                         # aircraft.activate_post_combustion()
 
