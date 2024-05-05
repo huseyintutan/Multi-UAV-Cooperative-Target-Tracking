@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft Data</title>
+</head>
+<body>
+    <h1>Aircraft Data</h1>
+
+    <h2>Lidar Data</h2>
+    <p>Range: {{ lidar_data[0] }}</p>
+    <p>Degree: {{ lidar_data[1] }}</p>
+
+    <h2>Gyro Data</h2>
+    <p>Rotation X: {{ gyro_data[0] }}</p>
+    <p>Rotation Y: {{ gyro_data[1] }}</p>
+    <p>Rotation Z: {{ gyro_data[2] }}</p>
+
+    <h2>GPS Data</h2>
+    <p>Latitude: {{ gps_data[0] }}</p>
+    <p>Longitude: {{ gps_data[1] }}</p>
+    <p>Altitude: {{ gps_data[2] }}</p>
+</body>
+</html>

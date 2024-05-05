@@ -1663,6 +1663,11 @@ class AircraftIAControlDevice(ControlDevice):
  
         td = aircraft.get_device("TargettingDevice")
         autopilot = aircraft.devices["AutopilotControlDevice"]
+        lidar_measurement = self.calculate_lidar_measurement(aircraft, dts)
+        gps_measurement = self.calculate_gps(aircraft, dts)
+        gyro_measurement = self.calculate_gyro(aircraft,dts)
+
+        
         if autopilot is not None:
             if "Gear" in aircraft.devices and aircraft.devices["Gear"] is not None:
                 gear = aircraft.devices["Gear"]
@@ -1699,6 +1704,7 @@ class AircraftIAControlDevice(ControlDevice):
                             print("Altitude correction deactivated")
                     else:
                         ally_pos = aircraft.parent_node.GetTransform().GetPos()
+
                         target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
 
                         # Calculate the vector between 2 points
@@ -1810,7 +1816,6 @@ class AircraftIAControlDevice(ControlDevice):
                     if alt < self.IA_altitude_min or alt > self.IA_altitude_max:
                         self.IA_flag_altitude_correction = True
 
-
     def controlled_device_hitted(self):
         print("controlled device running")
         aircraft = self.machine
@@ -1826,6 +1831,58 @@ class AircraftIAControlDevice(ControlDevice):
             if len(offenders) > 1:
                 offenders.sort(key=lambda p: p[1])
             td.set_target_id(offenders[0][0])
+
+    def calculate_lidar_measurement(self, aircraft, dts):
+        td = aircraft.get_device("TargettingDevice")
+
+        ally_pos = aircraft.parent_node.GetTransform().GetPos()
+        target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
+
+        diff_x = target_pos.x - ally_pos.x
+        diff_y = target_pos.y - ally_pos.y
+        diff_z = target_pos.z - ally_pos.z
+
+        range = math.sqrt(diff_x**2 + diff_y**2 + diff_z**2)
+
+        vector_x = target_pos.x - ally_pos.x
+        vector_z = target_pos.z - ally_pos.z
+
+        vector_norm = np.sqrt(vector_x ** 2 + vector_z ** 2)
+
+        unit_vector_x = vector_x / vector_norm
+        unit_vector_z = vector_z / vector_norm
+
+        heading_radians = np.arctan2(unit_vector_x, unit_vector_z)
+        theta = np.degrees(heading_radians)
+
+        print("Range:", range)
+        print("Degree:", theta)
+        print("Aircraft ID:",aircraft.id-5)
+
+        return range,theta
+
+    def calculate_gyro(self, aircraft, dts):
+
+        rotation = aircraft.parent_node.GetTransform().GetRot()
+        print("Rotation X:",rotation.x)
+        print("Rotation Y:",rotation.y)
+        print("Rotation Z:",rotation.z)
+        print("Aircraft ID:",aircraft.id-5)
+
+        return rotation.x, rotation.y, rotation.z
+
+    def calculate_gps(self, aircraft, dts):
+
+        gps_latitude = aircraft.parent_node.GetTransform().GetPos().x
+        gps_longitude = aircraft.parent_node.GetTransform().GetPos().y
+        gps_altitude = aircraft.parent_node.GetTransform().GetPos().z
+
+        print("Latitude:", gps_latitude)
+        print("Longitude:", gps_longitude)
+        print("Altitude:",gps_altitude)
+        print("Aircraft ID:",aircraft.id-5)
+
+        return gps_latitude, gps_longitude, gps_altitude
 
     # =============================== Keyboard commands ====================================
 
@@ -1874,3 +1931,6 @@ class AircraftIAControlDevice(ControlDevice):
                     self.update_cm_mouse(dts)
 
             self.update_controlled_device(dts)
+
+
+
