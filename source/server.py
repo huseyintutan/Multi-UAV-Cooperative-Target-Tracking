@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import socket
 import threading
+from udpclient import UdpSocket
 
 app = Flask(__name__)
 
@@ -9,19 +10,15 @@ gps_data = "No data received yet."
 
 def listen_for_gps_data():
     global gps_data
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('localhost', 8080))
-        s.listen()
-        while True:
-            conn, addr = s.accept()
-            with conn:
-                print(f"Connected by {addr}")
-                while True:
-                    data = conn.recv(1024)
-                    if not data:
-                        break
-                    gps_data = data.decode('utf-8')
-                    print("Received:", gps_data)
+    # UDP soketi oluştur
+    udp_socket = UdpSocket()
+    # UDP soketinden sürekli veri al
+    while True:
+        gps_data = udp_socket.recv()
+        print(gps_data)
+
+
+
 
 @app.route('/')
 def index():

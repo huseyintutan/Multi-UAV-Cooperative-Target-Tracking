@@ -11,6 +11,7 @@ import math
 from pubsub import pub
 from flask import Flask, render_template
 import socket
+from udpserver import UdpSocket
 
 
 
@@ -1403,7 +1404,8 @@ class AircraftIAControlDevice(ControlDevice):
         pub.subscribe(self.gps_data_handler, 'gps_data')
         #self.initialize_socket()
 
-
+        self.server = UdpSocket()
+        
         self.commands.update({
                 "ACTIVATE_USER_CONTROL": self.activate_user_control
             })
@@ -1894,40 +1896,8 @@ class AircraftIAControlDevice(ControlDevice):
         data = log_info.encode('utf-8')
 
         # Send the data over a socket connection
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect(('localhost', 8080))
-                s.sendall(data)
-        finally:
-            s.close()
-    # def initialize_socket(self):
-    #     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     self.socket.connect(('localhost', 8080))
 
-    # def calculate_gps(self, aircraft, dts):
-    #     gps_latitude = aircraft.parent_node.GetTransform().GetPos().x
-    #     gps_longitude = aircraft.parent_node.GetTransform().GetPos().y
-    #     gps_altitude = aircraft.parent_node.GetTransform().GetPos().z
-    #     pub.sendMessage('gps_data', message={'latitude': gps_latitude, 'longitude': gps_longitude, 'altitude': gps_altitude})
-      
-    #     return gps_latitude, gps_longitude, gps_altitude
-    
-    # def gps_data_handler(self, message):
-    #     latitude = message['latitude']
-    #     longitude = message['longitude']
-    #     altitude = message['altitude']
-    #     log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
-    #     print(log_info)
-    #     data = log_info.encode('utf-8')
-    #     try:
-    #         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #             s.connect(('localhost', 8080))
-    #             s.sendall(data)
-    #     except Exception as e:
-    #         print(f"Error: {e}")
-    #     finally:
-    #         s.close()
-
+        self.server.send(data)
 
 
     # =============================== Keyboard commands ====================================
