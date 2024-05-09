@@ -15,14 +15,15 @@ def print_fps():
 	dt = t1 - t0
 	t0 = t1
 	if dt > 0:
-		print(str(1 / dt))
+		pass
+		#print(str(1 / dt))
 
 df.connect("192.168.56.1", 50888)
 
 time.sleep(2)
 
 planes = df.get_planes_list()
-print(str(planes))
+#print(str(planes))
 
 df.disable_log()
 df.activate_IA(planes[0])
@@ -64,7 +65,7 @@ while s < 500 / 3.6:
 	plane_state = df.get_plane_state(plane_id)
 	df.update_scene()
 	next_physics = df.compute_next_timestep_physics(plane_id, 1/60)
-	print(str(next_physics))
+	#print(str(next_physics))
 	s = plane_state["linear_speed"]
 
 df.deactivate_post_combustion(plane_id)
@@ -81,7 +82,7 @@ df.deactivate_post_combustion(plane_id)
 a = 0
 
 while a < 500:
-	print_fps()
+	#print_fps()
 	# df.display_2DText([0.25, 0.75], "Plane speed: " + str(plane_state["linear_speed"]), 0.04, [1, 0.5, 0, 1])
 	df.update_scene()
 	plane_state = df.get_plane_state(plane_id)

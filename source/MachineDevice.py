@@ -8,6 +8,10 @@ from Particles import *
 import data_converter as dc
 import numpy as np
 import math
+from pubsub import pub
+from flask import Flask, render_template
+import socket
+
 
 
 # =====================================================================================================
@@ -1369,8 +1373,8 @@ class AircraftIAControlDevice(ControlDevice):
         ControlDevice.__init__(self, name, machine, inputs_mapping_file, "AircraftIAInputsMapping", control_mode, start_state)
         self.set_control_mode(control_mode)
 
-        self.IA_commands_labels = ["IA_COM_IDLE", "IA_COM_LIFTOFF", "IA_COM_FIGHT", "IA_COM_RETURN_TO_BASE", "IA_COM_LANDING"]
 
+        self.IA_commands_labels = ["IA_COM_IDLE", "IA_COM_LIFTOFF", "IA_COM_FIGHT", "IA_COM_RETURN_TO_BASE", "IA_COM_LANDING"]
         self.flag_IA_start_liftoff = True
         self.IA_liftoff_delay = 0
         self.IA_fire_missiles_delay = 10
@@ -1395,6 +1399,10 @@ class AircraftIAControlDevice(ControlDevice):
         self.IA_flag_landing_target_found = False
         self.IA_flag_goto_landing_approach_point = False
         self.IA_flag_reached_landing_point = False
+
+        pub.subscribe(self.gps_data_handler, 'gps_data')
+        #self.initialize_socket()
+
 
         self.commands.update({
                 "ACTIVATE_USER_CONTROL": self.activate_user_control
@@ -1511,7 +1519,7 @@ class AircraftIAControlDevice(ControlDevice):
                 self.update_IA_landing(aircraft, dts)
 
     def update_IA_liftoff(self, aircraft, dts):
-        print("liftoff running")
+        # print("liftoff running")
         self.IA_flag_landing_target_found = False
         aircraft.set_flaps_level(1)
         if self.flag_IA_start_liftoff:
@@ -1657,7 +1665,6 @@ class AircraftIAControlDevice(ControlDevice):
                                         aircraft.set_landed()
                                         self.IA_liftoff_delay = 2
                                         self.IA_command = AircraftIAControlDevice.IA_COM_LIFTOFF
-
 
     def update_IA_fight(self, aircraft, dts):
  
@@ -1833,6 +1840,7 @@ class AircraftIAControlDevice(ControlDevice):
             td.set_target_id(offenders[0][0])
 
     def calculate_lidar_measurement(self, aircraft, dts):
+
         td = aircraft.get_device("TargettingDevice")
 
         ally_pos = aircraft.parent_node.GetTransform().GetPos()
@@ -1855,34 +1863,72 @@ class AircraftIAControlDevice(ControlDevice):
         heading_radians = np.arctan2(unit_vector_x, unit_vector_z)
         theta = np.degrees(heading_radians)
 
-        print("Range:", range)
-        print("Degree:", theta)
-        print("Aircraft ID:",aircraft.id-5)
-
         return range,theta
 
-    def calculate_gyro(self, aircraft, dts):
+    def calculate_gyro(self,aircraft, dts):
 
         rotation = aircraft.parent_node.GetTransform().GetRot()
-        print("Rotation X:",rotation.x)
-        print("Rotation Y:",rotation.y)
-        print("Rotation Z:",rotation.z)
-        print("Aircraft ID:",aircraft.id-5)
 
         return rotation.x, rotation.y, rotation.z
 
-    def calculate_gps(self, aircraft, dts):
-
+    def calculate_gps(self,aircraft, dts):
         gps_latitude = aircraft.parent_node.GetTransform().GetPos().x
         gps_longitude = aircraft.parent_node.GetTransform().GetPos().y
         gps_altitude = aircraft.parent_node.GetTransform().GetPos().z
 
-        print("Latitude:", gps_latitude)
-        print("Longitude:", gps_longitude)
-        print("Altitude:",gps_altitude)
-        print("Aircraft ID:",aircraft.id-5)
+        #print(gps_altitude)
+
+        pub.sendMessage('gps_data', message={'latitude': gps_latitude, 'longitude': gps_longitude, 'altitude': gps_altitude})
 
         return gps_latitude, gps_longitude, gps_altitude
+
+
+    def gps_data_handler(self,message):
+        latitude = message['latitude']
+        longitude = message['longitude']
+        altitude = message['altitude']
+        log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
+
+        print(log_info)
+        # Prepare the data to be sent over the socket
+        data = log_info.encode('utf-8')
+
+        # Send the data over a socket connection
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect(('localhost', 8080))
+                s.sendall(data)
+        finally:
+            s.close()
+    # def initialize_socket(self):
+    #     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     self.socket.connect(('localhost', 8080))
+
+    # def calculate_gps(self, aircraft, dts):
+    #     gps_latitude = aircraft.parent_node.GetTransform().GetPos().x
+    #     gps_longitude = aircraft.parent_node.GetTransform().GetPos().y
+    #     gps_altitude = aircraft.parent_node.GetTransform().GetPos().z
+    #     pub.sendMessage('gps_data', message={'latitude': gps_latitude, 'longitude': gps_longitude, 'altitude': gps_altitude})
+      
+    #     return gps_latitude, gps_longitude, gps_altitude
+    
+    # def gps_data_handler(self, message):
+    #     latitude = message['latitude']
+    #     longitude = message['longitude']
+    #     altitude = message['altitude']
+    #     log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
+    #     print(log_info)
+    #     data = log_info.encode('utf-8')
+    #     try:
+    #         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    #             s.connect(('localhost', 8080))
+    #             s.sendall(data)
+    #     except Exception as e:
+    #         print(f"Error: {e}")
+    #     finally:
+    #         s.close()
+
+
 
     # =============================== Keyboard commands ====================================
 
@@ -1921,6 +1967,7 @@ class AircraftIAControlDevice(ControlDevice):
         im = self.inputs_mapping["AircraftIAInputsMapping"]["Mouse"]
 
     def update(self, dts):
+
         if self.activated:
             if self.flag_user_control and self.machine.has_focus():
                 if self.control_mode == ControlDevice.CM_KEYBOARD:
@@ -1933,4 +1980,5 @@ class AircraftIAControlDevice(ControlDevice):
             self.update_controlled_device(dts)
 
 
-
+        return False
+    
