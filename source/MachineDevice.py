@@ -1892,10 +1892,7 @@ class AircraftIAControlDevice(ControlDevice):
         log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
 
         print(log_info)
-        # Prepare the data to be sent over the socket
         data = log_info.encode('utf-8')
-
-        # Send the data over a socket connection
 
         self.server.send(data)
 

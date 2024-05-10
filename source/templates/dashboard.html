@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Info Dashboard</title>
+    <style>
+        @font-face {
+            font-family: 'Furore';
+            src: url('{{ url_for("static", filename="fonts/Furore.otf") }}') format("truetype");
+        }
+        body {
+            font-family: 'Furore', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+        }
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            background-size: cover;
+        }
+        #clock {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            color: #fff; /* Saat rengini beyaz yapın */
+        }
+        #server-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .aircraft, .extra-block {
+            width: 30%;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            margin-top: 20px;
+            animation: glow 2s infinite alternate;
+        }
+        h1:hover {
+            animation-play-state: paused;
+        }
+        @keyframes glow {
+            0% {
+                color: #fff;
+            }
+            50% {
+                color: #feda6a;
+            }
+            100% {
+                color: #fff;
+            }
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="video-background">
+        <source src="{{ url_for('static', filename='videos/background.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div id="clock"></div>
+    <div id="server-info">IP:192.168.1.1 Port:8080</div>
+    <h1>Sensor Info Dashboard</h1>
+    <div class="container">
+        <div class="aircraft">
+            <h2>MIUS-1</h2>
+            <p><strong>Latitude:{{ gps_data }}</strong> <span id="lat1">-</span></p>
+            <p><strong>Longitude:</strong> <span id="long1">-</span></p>
+            <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
+            <p><strong>IMU:</strong> <span id="imu1">-</span></p>
+            <p><strong>Gyro:</strong> <span id="gyro1">-</span></p>
+            <p><strong>Vertical Speed:</strong> <span id="v_speed1">-</span></p>
+            <p><strong>Ground Speed:</strong> <span id="g_speed1">-</span></p>
+            <p><strong>Heading:</strong> <span id="heading1">-</span></p>
+        </div>
+        <div class="aircraft">
+            <h2>MIUS-2</h2>
+            <p><strong>Latitude:</strong> <span id="lat2">-</span></p>
+            <p><strong>Longitude:</strong> <span id="long2">-</span></p>
+            <p><strong>Altitude:</strong> <span id="alt2">-</span></p>
+            <p><strong>IMU:</strong> <span id="imu2">-</span></p>
+            <p><strong>Gyro:</strong> <span id="gyro2">-</span></p>
+            <p><strong>Vertical Speed:</strong> <span id="v_speed2">-</span></p>
+            <p><strong>Ground Speed:</strong> <span id="g_speed2">-</span></p>
+            <p><strong>Heading:</strong> <span id="heading2">-</span></p>
+        </div>
+        <div class="aircraft">
+            <h2>MIUS-3</h2>
+            <p><strong>Latitude:</strong> <span id="lat3">-</span></p>
+            <p><strong>Longitude:</strong> <span id="long3">-</span></p>
+            <p><strong>Altitude:</strong> <span id="alt3">-</span></p>
+            <p><strong>IMU:</strong> <span id="imu3">-</span></p>
+            <p><strong>Gyro:</strong> <span id="gyro3">-</span></p>
+            <p><strong>Vertical Speed:</strong> <span id="v_speed3">-</span></p>
+            <p><strong>Ground Speed:</strong> <span id="g_speed3">-</span></p>
+            <p><strong>Heading:</strong> <span id="heading3">-</span></p>
+        </div>
+    </div>
+    
+    <!-- Yeni eklenen bloklar -->
+    <div class="container">
+        <div class="extra-block">
+            <h2>TF-X</h2>
+            <p><strong>Latitude:</strong> <span id="lat1">-</span></p>
+            <p><strong>Longitude:</strong> <span id="long1">-</span></p>
+            <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
+            <p><strong>Vertical Speed:</strong> <span id="v_speed3">-</span></p>
+            <p><strong>Ground Speed:</strong> <span id="g_speed3">-</span></p>
+            <p><strong>Heading:</strong> <span id="heading3">-</span></p>
+        </div>
+        <div class="extra-block">
+            <h2>EKF Results</h2>
+            <p><strong>Latitude:</strong> <span id="lat1">-</span></p>
+            <p><strong>Longitude:</strong> <span id="long1">-</span></p>
+            <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
+            <p><strong>Vertical Speed:</strong> <span id="v_speed3">-</span></p>
+            <p><strong>Ground Speed:</strong> <span id="g_speed3">-</span></p>
+            <p><strong>Heading:</strong> <span id="heading3">-</span></p>
+        </div>
+        <div class="extra-block">
+            <h2>UKF Results</h2>
+            <p><strong>Latitude:</strong> <span id="lat1">-</span></p>
+            <p><strong>Longitude:</strong> <span id="long1">-</span></p>
+            <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
+            <p><strong>Vertical Speed:</strong> <span id="v_speed3">-</span></p>
+            <p><strong>Ground Speed:</strong> <span id="g_speed3">-</span></p>
+            <p><strong>Heading:</strong> <span id="heading3">-</span></p>
+        </div>
+    </div>
+
+    <script>
+        function updateTime() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+
+            document.getElementById('clock').innerHTML = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ' ' + now.toDateString();
+
+            setTimeout(updateTime, 1000);
+        }
+
+        updateTime();
+    </script>
+</body>
+</html>

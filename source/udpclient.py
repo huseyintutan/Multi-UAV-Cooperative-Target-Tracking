@@ -1,7 +1,5 @@
 import socket
 
-# create a udp socket class for receiving string stream
-
 class UdpSocket:
     def __init__(self, host='localhost', port=1234):
         self.host = host
