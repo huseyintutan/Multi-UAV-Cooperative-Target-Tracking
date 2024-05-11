@@ -176,13 +176,14 @@
 
         function updateGPSData() {
             $.ajax({
-                url: "/",
+                url: "/get_gps_data",
                 type: "GET",
-                success: function(response) {
-
-                    document.getElementById("lat1").innerText = response.latitude;
-                    document.getElementById("long1").innerText = response.longitude;
-                    document.getElementById("alt1").innerText = response.altitude;
+                success: function(data) {
+                    console.log(data);
+                    const obj = JSON.parse(data)
+                    document.getElementById("lat1").innerText = obj.latitude;
+                    document.getElementById("long1").innerText = obj.longitude;
+                    document.getElementById("alt1").innerText = obj.altitude;
                 }
             });
         }   
