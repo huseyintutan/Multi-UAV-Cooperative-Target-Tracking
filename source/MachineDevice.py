@@ -1885,18 +1885,35 @@ class AircraftIAControlDevice(ControlDevice):
         return gps_latitude, gps_longitude, gps_altitude
 
 
-    def gps_data_handler(self,message):
-        latitude = message['latitude']
-        longitude = message['longitude']
-        altitude = message['altitude']
-        log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
+    # def gps_data_handler(self,message):
+    #     latitude = message['latitude']
+    #     longitude = message['longitude']
+    #     altitude = message['altitude']
+    #     log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
 
-        print(log_info)
-        data = log_info.encode('utf-8')
+    #     print(log_info)
+    #     data = log_info.encode('utf-8')
 
-        self.server.send(data)
+    #     self.server.send(data)
 
+    def gps_data_handler(self, message):
+            latitude = message['latitude']
+            longitude = message['longitude']
+            altitude = message['altitude']
 
+            log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
+            #print(log_info)
+
+            json_data = {
+                'latitude': latitude,
+                'longitude': longitude,
+                'altitude': altitude
+            }
+
+            data = json.dumps(json_data).encode('utf-8')
+            #print(type(data))
+            self.server.send(data)
+            
     # =============================== Keyboard commands ====================================
 
     def activate_user_control(self, value):
