@@ -12,11 +12,16 @@ def listen_for_gps_data():
     udp_socket = UdpSocket()
     while True:
         gps_data = udp_socket.recv()
-        print(gps_data)
+        #print(gps_data)
 
 @app.route('/')
 def index():
     return render_template('dashboard.html', gps_data=gps_data)
+
+@app.route('/get_gps_data')
+def get_gps_data():
+
+    return gps_data
 
 if __name__ == '__main__':
     thread = threading.Thread(target=listen_for_gps_data)
