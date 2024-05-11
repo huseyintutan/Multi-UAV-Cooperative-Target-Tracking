@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Info Dashboard</title>
@@ -95,7 +96,7 @@
     <div class="container">
         <div class="aircraft">
             <h2>MIUS-1</h2>
-            <p><strong>Latitude:{{ gps_data }}</strong> <span id="lat1">-</span></p>
+            <p><strong>Latitude:</strong> <span id="lat1">-</span></p>
             <p><strong>Longitude:</strong> <span id="long1">-</span></p>
             <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
             <p><strong>IMU:</strong> <span id="imu1">-</span></p>
@@ -172,6 +173,23 @@
         }
 
         updateTime();
+
+        function updateGPSData() {
+            $.ajax({
+                url: "/",
+                type: "GET",
+                success: function(response) {
+
+                    document.getElementById("lat1").innerText = response.latitude;
+                    document.getElementById("long1").innerText = response.longitude;
+                    document.getElementById("alt1").innerText = response.altitude;
+                }
+            });
+        }   
+
+        setInterval(updateGPSData, 500); 
+
+        
     </script>
 </body>
 </html>
