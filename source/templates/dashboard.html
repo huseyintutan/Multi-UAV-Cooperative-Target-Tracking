@@ -101,7 +101,7 @@
             <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
             <p><strong>IMU:</strong> <span id="imu1">-</span></p>
             <p><strong>Gyro:</strong> <span id="gyro1">-</span></p>
-            <p><strong>Vertical Speed:</strong> <span id="v_speed1">-</span></p>
+            <p><strong>Linear Speed:</strong> <span id="v_speed1">-</span></p>
             <p><strong>Ground Speed:</strong> <span id="g_speed1">-</span></p>
             <p><strong>Heading:</strong> <span id="heading1">-</span></p>
         </div>
@@ -112,7 +112,7 @@
             <p><strong>Altitude:</strong> <span id="alt2">-</span></p>
             <p><strong>IMU:</strong> <span id="imu2">-</span></p>
             <p><strong>Gyro:</strong> <span id="gyro2">-</span></p>
-            <p><strong>Vertical Speed:</strong> <span id="v_speed2">-</span></p>
+            <p><strong>Linear Speed:</strong> <span id="v_speed2">-</span></p>
             <p><strong>Ground Speed:</strong> <span id="g_speed2">-</span></p>
             <p><strong>Heading:</strong> <span id="heading2">-</span></p>
         </div>
@@ -123,7 +123,7 @@
             <p><strong>Altitude:</strong> <span id="alt3">-</span></p>
             <p><strong>IMU:</strong> <span id="imu3">-</span></p>
             <p><strong>Gyro:</strong> <span id="gyro3">-</span></p>
-            <p><strong>Vertical Speed:</strong> <span id="v_speed3">-</span></p>
+            <p><strong>Linear Speed:</strong> <span id="v_speed3">-</span></p>
             <p><strong>Ground Speed:</strong> <span id="g_speed3">-</span></p>
             <p><strong>Heading:</strong> <span id="heading3">-</span></p>
         </div>
@@ -181,14 +181,25 @@
                 success: function(data) {
                     console.log(data);
                     const obj = JSON.parse(data)
-                    document.getElementById("lat1").innerText = obj.latitude;
-                    document.getElementById("long1").innerText = obj.longitude;
-                    document.getElementById("alt1").innerText = obj.altitude;
+                    document.getElementById("lat1").innerText = obj.latitude1;
+                    document.getElementById("long1").innerText = obj.longitude1;
+                    document.getElementById("alt1").innerText = obj.altitude1;
+                    document.getElementById("v_speed1").innerText = obj.linear_speed1;
+
+                    document.getElementById("lat2").innerText = obj.latitude2;
+                    document.getElementById("long2").innerText = obj.longitude2;
+                    document.getElementById("alt2").innerText = obj.altitude2;
+                    document.getElementById("v_speed2").innerText = obj.linear_speed2;
+
+                    document.getElementById("lat3").innerText = obj.latitude3;
+                    document.getElementById("long3").innerText = obj.longitude3;
+                    document.getElementById("alt3").innerText = obj.altitude3;
+                    document.getElementById("v_speed3").innerText = obj.linear_speed3;
                 }
             });
         }   
 
-        setInterval(updateGPSData, 500); 
+        setInterval(updateGPSData, 100); 
 
         
     </script>
