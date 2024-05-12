@@ -1401,6 +1401,21 @@ class AircraftIAControlDevice(ControlDevice):
         self.IA_flag_goto_landing_approach_point = False
         self.IA_flag_reached_landing_point = False
 
+        self.gps_latitude1 = None
+        self.gps_longitude1 = None
+        self.gps_altitude1 = None
+        self.linear_speed1 = None
+
+        self.gps_latitude2 = None
+        self.gps_longitude2 = None
+        self.gps_altitude2 = None
+        self.linear_speed2 = None
+
+        self.gps_latitude3 = None
+        self.gps_longitude3 = None
+        self.gps_altitude3 = None
+        self.linear_speed3 = None
+
         pub.subscribe(self.gps_data_handler, 'gps_data')
         #self.initialize_socket()
 
@@ -1873,47 +1888,79 @@ class AircraftIAControlDevice(ControlDevice):
 
         return rotation.x, rotation.y, rotation.z
 
-    def calculate_gps(self,aircraft, dts):
-        gps_latitude = aircraft.parent_node.GetTransform().GetPos().x
-        gps_longitude = aircraft.parent_node.GetTransform().GetPos().y
-        gps_altitude = aircraft.parent_node.GetTransform().GetPos().z
-
+    def calculate_gps(self, aircraft, dts):
+        if aircraft.id == 6:
+            self.gps_latitude1 = aircraft.parent_node.GetTransform().GetPos().x
+            self.gps_longitude1 = aircraft.parent_node.GetTransform().GetPos().y
+            self.gps_altitude1 = aircraft.parent_node.GetTransform().GetPos().z
+            self.linear_speed1 = aircraft.get_linear_speed() * 3.6
+        elif aircraft.id == 7: 
+            self.gps_latitude2 = aircraft.parent_node.GetTransform().GetPos().x
+            self.gps_longitude2 = aircraft.parent_node.GetTransform().GetPos().y
+            self.gps_altitude2 = aircraft.parent_node.GetTransform().GetPos().z
+            self.linear_speed2 = aircraft.get_linear_speed() * 3.6
+        elif aircraft.id == 8: 
+            self.gps_latitude3 = aircraft.parent_node.GetTransform().GetPos().x
+            self.gps_longitude3 = aircraft.parent_node.GetTransform().GetPos().y
+            self.gps_altitude3 = aircraft.parent_node.GetTransform().GetPos().z
+            self.linear_speed3 = aircraft.get_linear_speed() * 3.6
+            
+        if (self.gps_latitude1 is None or self.gps_longitude1 is None or self.gps_altitude1 is None or
+            self.gps_latitude2 is None or self.gps_longitude2 is None or self.gps_altitude2 is None or
+            self.gps_latitude3 is None or self.gps_longitude3 is None or self.gps_altitude3 is None):
+            # Hata durumu: Uçaklar için tüm değerler atanmamış
+            print("Hata: Uçaklar için tüm değerler atanmamış!")
+            return
         #print(gps_altitude)
 
-        pub.sendMessage('gps_data', message={'latitude': gps_latitude, 'longitude': gps_longitude, 'altitude': gps_altitude})
+        pub.sendMessage('gps_data', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
+                                            'latitude2': self.gps_latitude2, 'longitude2': self.gps_longitude2, 'altitude2': self.gps_altitude2,
+                                            'latitude3': self.gps_latitude3, 'longitude3': self.gps_longitude3, 'altitude3': self.gps_altitude3,
+                                            'linear_speed1': self.linear_speed1, 'linear_speed2': self.linear_speed2, 'linear_speed3': self.linear_speed3})
 
-        return gps_latitude, gps_longitude, gps_altitude
+
+            #return gps_latitude, gps_longitude, gps_altitude
 
 
-    # def gps_data_handler(self,message):
-    #     latitude = message['latitude']
-    #     longitude = message['longitude']
-    #     altitude = message['altitude']
-    #     log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
-
-    #     print(log_info)
-    #     data = log_info.encode('utf-8')
-
-    #     self.server.send(data)
 
     def gps_data_handler(self, message):
-            latitude = message['latitude']
-            longitude = message['longitude']
-            altitude = message['altitude']
+            self.latitude1 = message['latitude1']
+            self.longitude1 = message['longitude1']
+            self.altitude1 = message['altitude1']
+            self.linear_speed1 = message['linear_speed1']
 
-            log_info = f"Received GPS Data - Latitude: {latitude}, Longitude: {longitude}, Altitude: {altitude}"
-            #print(log_info)
+            self.latitude2 = message['latitude2']
+            self.longitude2 = message['longitude2']
+            self.altitude2 = message['altitude2']
+            self.linear_speed2 = message['linear_speed2']
+
+            self.latitude3 = message['latitude3']
+            self.longitude3 = message['longitude3']
+            self.altitude3 = message['altitude3']
+            self.linear_speed3 = message['linear_speed3']
+
 
             json_data = {
-                'latitude': latitude,
-                'longitude': longitude,
-                'altitude': altitude
+                'latitude1': self.latitude1,
+                'longitude1': self.longitude1,
+                'altitude1': self.altitude1,
+                'linear_speed1':self.linear_speed1,
+
+                'latitude2': self.latitude2,
+                'longitude2': self.longitude2,
+                'altitude2': self.altitude2,
+                'linear_speed2':self.linear_speed2,
+
+                'latitude3': self.latitude3,
+                'longitude3': self.longitude3,
+                'altitude3': self.altitude3,
+                'linear_speed3':self.linear_speed3,
             }
 
             data = json.dumps(json_data).encode('utf-8')
             #print(type(data))
             self.server.send(data)
-            
+
     # =============================== Keyboard commands ====================================
 
     def activate_user_control(self, value):
