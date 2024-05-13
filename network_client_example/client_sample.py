@@ -23,7 +23,7 @@ df.connect("192.168.56.1", 50888)
 time.sleep(2)
 
 planes = df.get_planes_list()
-#print(str(planes))
+print(str(planes))
 
 df.disable_log()
 df.activate_IA(planes[0])

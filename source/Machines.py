@@ -435,6 +435,7 @@ class Destroyable_Machine(AnimatedModel):
 
     def add_device(self, device: MachineDevice):
         self.devices[device.name] = device
+        print(self.devices)
 
     def remove_device(self, device_name):
         if device_name in self.devices:

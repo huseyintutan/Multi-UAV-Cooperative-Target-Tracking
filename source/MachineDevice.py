@@ -12,6 +12,7 @@ from pubsub import pub
 from flask import Flask, render_template
 import socket
 from udpserver import UdpSocket
+import threading
 
 
 
@@ -1167,7 +1168,7 @@ class AircraftAutopilotControlDevice(ControlDevice):
             })
 
 
-    # ============================== functions
+    # ============================== functions ============================== 
 
     def activate(self):
         if not self.activated:
@@ -1261,6 +1262,7 @@ class AircraftAutopilotControlDevice(ControlDevice):
 
     def update_controlled_devices(self, dts):
         aircraft = self.machine
+        
         if not aircraft.wreck and not aircraft.flag_going_to_takeoff_position and not aircraft.flag_landed:
             if self.autopilot_speed >= 0:
                 a_range = 1
@@ -1401,10 +1403,10 @@ class AircraftIAControlDevice(ControlDevice):
         self.IA_flag_goto_landing_approach_point = False
         self.IA_flag_reached_landing_point = False
 
-        self.gps_latitude1 = None
-        self.gps_longitude1 = None
-        self.gps_altitude1 = None
-        self.linear_speed1 = None
+        self.gps_latitude1 = 0
+        self.gps_longitude1 = 0
+        self.gps_altitude1 = 0
+        self.linear_speed1 = 0
 
         self.gps_latitude2 = None
         self.gps_longitude2 = None
@@ -1415,6 +1417,15 @@ class AircraftIAControlDevice(ControlDevice):
         self.gps_longitude3 = None
         self.gps_altitude3 = None
         self.linear_speed3 = None
+
+        self.mius1 = machine
+        self.mius2 = machine
+        self.mius3 = machine
+
+        self.gyro1 = None
+        self.gyro2 = None
+        self.gyro3 = None
+
 
         pub.subscribe(self.gps_data_handler, 'gps_data')
         #self.initialize_socket()
@@ -1429,6 +1440,7 @@ class AircraftIAControlDevice(ControlDevice):
 
     def activate(self):
         print("activate running")
+
 
         if not self.activated:
             ControlDevice.activate(self)
@@ -1684,12 +1696,12 @@ class AircraftIAControlDevice(ControlDevice):
                                         self.IA_command = AircraftIAControlDevice.IA_COM_LIFTOFF
 
     def update_IA_fight(self, aircraft, dts):
- 
+        
         td = aircraft.get_device("TargettingDevice")
         autopilot = aircraft.devices["AutopilotControlDevice"]
-        lidar_measurement = self.calculate_lidar_measurement(aircraft, dts)
-        gps_measurement = self.calculate_gps(aircraft, dts)
-        gyro_measurement = self.calculate_gyro(aircraft,dts)
+        self.calculate_lidar_measurement(aircraft, dts)
+        self.calculate_gps(aircraft, dts)
+
 
         
         if autopilot is not None:
@@ -1889,37 +1901,73 @@ class AircraftIAControlDevice(ControlDevice):
         return rotation.x, rotation.y, rotation.z
 
     def calculate_gps(self, aircraft, dts):
+
+
         if aircraft.id == 6:
             self.gps_latitude1 = aircraft.parent_node.GetTransform().GetPos().x
             self.gps_longitude1 = aircraft.parent_node.GetTransform().GetPos().y
-            self.gps_altitude1 = aircraft.parent_node.GetTransform().GetPos().z
+            self.gps_altitude1 = aircraft.get_altitude()
             self.linear_speed1 = aircraft.get_linear_speed() * 3.6
+            self.gyro1 = aircraft.parent_node.GetTransform().GetRot()
+
         elif aircraft.id == 7: 
+            self.linear_speed2 = aircraft.get_linear_speed() * 3.6
             self.gps_latitude2 = aircraft.parent_node.GetTransform().GetPos().x
             self.gps_longitude2 = aircraft.parent_node.GetTransform().GetPos().y
-            self.gps_altitude2 = aircraft.parent_node.GetTransform().GetPos().z
-            self.linear_speed2 = aircraft.get_linear_speed() * 3.6
+            self.gps_altitude2 = aircraft.get_altitude()
+            self.gyro3 = aircraft.parent_node.GetTransform().GetRot()
+
         elif aircraft.id == 8: 
             self.gps_latitude3 = aircraft.parent_node.GetTransform().GetPos().x
             self.gps_longitude3 = aircraft.parent_node.GetTransform().GetPos().y
-            self.gps_altitude3 = aircraft.parent_node.GetTransform().GetPos().z
+            self.gps_altitude3 = aircraft.get_altitude()
             self.linear_speed3 = aircraft.get_linear_speed() * 3.6
+            self.gyro3 = aircraft.parent_node.GetTransform().GetRot()
+
             
-        if (self.gps_latitude1 is None or self.gps_longitude1 is None or self.gps_altitude1 is None or
-            self.gps_latitude2 is None or self.gps_longitude2 is None or self.gps_altitude2 is None or
-            self.gps_latitude3 is None or self.gps_longitude3 is None or self.gps_altitude3 is None):
-            # Hata durumu: Uçaklar için tüm değerler atanmamış
-            print("Hata: Uçaklar için tüm değerler atanmamış!")
-            return
-        #print(gps_altitude)
+
+
+
+        # if aircraft.id == 6:
+        #     self.mius1 = aircraft
+        # if aircraft.id == 7: 
+        #     self.mius2 = aircraft
+        # if aircraft.id == 8: 
+        #     self.mius3 = aircraft
+
+        # if 'self.mius1' not in locals():
+        #     print("mius1 değişkeni tanımlı değil veya None.")
+        # else:
+        #     self.gps_latitude1 = self.mius1.parent_node.GetTransform().GetPos().x
+        #     self.gps_longitude1 = self.mius1.parent_node.GetTransform().GetPos().y
+        #     self.gps_altitude1 = self.mius1.get_altitude()
+        #     self.linear_speed1 = self.mius1.get_linear_speed() * 3.6
+        #     print(self.linear_speed1)
+
+        # if 'self.mius2' not in locals():
+        #     print("mius2 değişkeni tanımlı değil veya None.")
+        # else:
+        #     self.gps_latitude2 = self.mius2.parent_node.GetTransform().GetPos().x
+        #     self.gps_longitude2 = self.mius2.parent_node.GetTransform().GetPos().y
+        #     self.gps_altitude2 = self.mius2.get_altitude()
+        #     self.linear_speed2 = self.mius2.get_linear_speed() * 3.6
+
+        # if 'self.mius3' not in locals():
+        #     print("mius3 değişkeni tanımlı değil veya None.")
+        # else:
+        #     self.gps_latitude3 = self.mius3.parent_node.GetTransform().GetPos().x
+        #     self.gps_longitude3 = self.mius3.parent_node.GetTransform().GetPos().y
+        #     self.gps_altitude3 = self.mius3.get_altitude()
+        #     self.linear_speed3 = self.mius3.get_linear_speed() * 3.6
 
         pub.sendMessage('gps_data', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
                                             'latitude2': self.gps_latitude2, 'longitude2': self.gps_longitude2, 'altitude2': self.gps_altitude2,
                                             'latitude3': self.gps_latitude3, 'longitude3': self.gps_longitude3, 'altitude3': self.gps_altitude3,
-                                            'linear_speed1': self.linear_speed1, 'linear_speed2': self.linear_speed2, 'linear_speed3': self.linear_speed3})
+                                            'linear_speed1': self.linear_speed1, 'linear_speed2': self.linear_speed2, 'linear_speed3': self.linear_speed3,
+                                            'gyro1' : self.gyro1, 'gyro2' : self.gyro1, 'gyro3' : self.gyro1})
 
 
-            #return gps_latitude, gps_longitude, gps_altitude
+        #return gps_latitude, gps_longitude, gps_altitude
 
 
 
@@ -1928,16 +1976,22 @@ class AircraftIAControlDevice(ControlDevice):
             self.longitude1 = message['longitude1']
             self.altitude1 = message['altitude1']
             self.linear_speed1 = message['linear_speed1']
+            # self.gyro1 = message['gyro1']
+
 
             self.latitude2 = message['latitude2']
             self.longitude2 = message['longitude2']
             self.altitude2 = message['altitude2']
             self.linear_speed2 = message['linear_speed2']
+            # self.gyro1 = message['gyro2']
+
 
             self.latitude3 = message['latitude3']
             self.longitude3 = message['longitude3']
             self.altitude3 = message['altitude3']
             self.linear_speed3 = message['linear_speed3']
+            # self.gyro1 = message['gyro3']
+
 
 
             json_data = {
@@ -1945,16 +1999,19 @@ class AircraftIAControlDevice(ControlDevice):
                 'longitude1': self.longitude1,
                 'altitude1': self.altitude1,
                 'linear_speed1':self.linear_speed1,
+                # 'gyro1':self.gyro1,
 
                 'latitude2': self.latitude2,
                 'longitude2': self.longitude2,
                 'altitude2': self.altitude2,
                 'linear_speed2':self.linear_speed2,
+                # 'gyro2':self.gyro2,
 
                 'latitude3': self.latitude3,
                 'longitude3': self.longitude3,
                 'altitude3': self.altitude3,
                 'linear_speed3':self.linear_speed3,
+                # 'gyro3':self.gyro3
             }
 
             data = json.dumps(json_data).encode('utf-8')
@@ -1998,7 +2055,7 @@ class AircraftIAControlDevice(ControlDevice):
         im = self.inputs_mapping["AircraftIAInputsMapping"]["Mouse"]
 
     def update(self, dts):
-
+        
         if self.activated:
             if self.flag_user_control and self.machine.has_focus():
                 if self.control_mode == ControlDevice.CM_KEYBOARD:
