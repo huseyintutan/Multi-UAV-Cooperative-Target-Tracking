@@ -174,9 +174,9 @@
 
         updateTime();
 
-        function updateGPSData() {
+        function updateData1() {
             $.ajax({
-                url: "/get_gps_data",
+                url: "/get_data1",
                 type: "GET",
                 success: function(data) {
                     console.log(data);
@@ -187,22 +187,47 @@
                     document.getElementById("v_speed1").innerText = obj.linear_speed1;
                     document.getElementById("gyro1").innerText = obj.gyro1;
 
+                }
+            });
+        }
+
+        function updateData2() {
+            $.ajax({
+                url: "/get_data2",
+                type: "GET",
+                success: function(data) {
+                    console.log(data);
+                    const obj = JSON.parse(data)
                     document.getElementById("lat2").innerText = obj.latitude2;
                     document.getElementById("long2").innerText = obj.longitude2;
                     document.getElementById("alt2").innerText = obj.altitude2;
                     document.getElementById("v_speed2").innerText = obj.linear_speed2;
                     document.getElementById("gyro2").innerText = obj.gyro2;
 
+                }
+            });
+        }
+
+        function updateData3() {
+            $.ajax({
+                url: "/get_data3",
+                type: "GET",
+                success: function(data) {
+                    console.log(data);
+                    const obj = JSON.parse(data)
                     document.getElementById("lat3").innerText = obj.latitude3;
                     document.getElementById("long3").innerText = obj.longitude3;
                     document.getElementById("alt3").innerText = obj.altitude3;
                     document.getElementById("v_speed3").innerText = obj.linear_speed3;
                     document.getElementById("gyro3").innerText = obj.gyro3;
+
                 }
             });
-        }   
+        }         
 
-        setInterval(updateGPSData, 100); 
+        setInterval(updateData1, 100); 
+        setInterval(updateData2, 100);
+        setInterval(updateData3, 100);
 
         
     </script>
