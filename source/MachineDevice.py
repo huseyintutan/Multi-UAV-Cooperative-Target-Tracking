@@ -1427,7 +1427,10 @@ class AircraftIAControlDevice(ControlDevice):
         self.gyro3 = None
 
 
-        pub.subscribe(self.gps_data_handler, 'gps_data')
+        pub.subscribe(self.data_handler1, 'sensor_data1')
+        pub.subscribe(self.data_handler2, 'sensor_data2')
+        pub.subscribe(self.data_handler3, 'sensor_data3')
+
         #self.initialize_socket()
 
         self.server = UdpSocket()
@@ -1700,7 +1703,10 @@ class AircraftIAControlDevice(ControlDevice):
         td = aircraft.get_device("TargettingDevice")
         autopilot = aircraft.devices["AutopilotControlDevice"]
         self.calculate_lidar_measurement(aircraft, dts)
-        self.calculate_gps(aircraft, dts)
+
+        self.sensor_aircraft1(aircraft, dts)
+        self.sensor_aircraft2(aircraft, dts)
+        self.sensor_aircraft3(aircraft, dts)
 
 
         
@@ -1900,99 +1906,51 @@ class AircraftIAControlDevice(ControlDevice):
 
         return rotation.x, rotation.y, rotation.z
 
-    def calculate_gps(self, aircraft, dts):
-
+    def sensor_aircraft1(self, aircraft, dts):
 
         if aircraft.id == 6:
             self.gps_latitude1 = aircraft.parent_node.GetTransform().GetPos().x
-            self.gps_longitude1 = aircraft.parent_node.GetTransform().GetPos().y
+            self.gps_longitude1 = aircraft.parent_node.GetTransform().GetPos().z
             self.gps_altitude1 = aircraft.get_altitude()
             self.linear_speed1 = aircraft.get_linear_speed() * 3.6
             self.gyro1 = aircraft.parent_node.GetTransform().GetRot()
+            pub.sendMessage('sensor_data1', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
+                                                'linear_speed1': self.linear_speed1,'gyro1' : self.gyro1, })
+        else:
+            pass
+        
+    def sensor_aircraft2(self, aircraft, dts):
 
-        elif aircraft.id == 7: 
-            self.linear_speed2 = aircraft.get_linear_speed() * 3.6
+        if aircraft.id == 7:
             self.gps_latitude2 = aircraft.parent_node.GetTransform().GetPos().x
-            self.gps_longitude2 = aircraft.parent_node.GetTransform().GetPos().y
+            self.gps_longitude2 = aircraft.parent_node.GetTransform().GetPos().z
             self.gps_altitude2 = aircraft.get_altitude()
-            self.gyro3 = aircraft.parent_node.GetTransform().GetRot()
+            self.linear_speed2 = aircraft.get_linear_speed() * 3.6
+            self.gyro2 = aircraft.parent_node.GetTransform().GetRot()
+            pub.sendMessage('sensor_data2', message={'latitude2': self.gps_latitude2, 'longitude2': self.gps_longitude2, 'altitude2': self.gps_altitude2,
+                                            'linear_speed2': self.linear_speed2,'gyro2' : self.gyro2, })
+        else:
+            pass
+        
+    def sensor_aircraft3(self, aircraft, dts):
 
-        elif aircraft.id == 8: 
+        if aircraft.id == 8:
             self.gps_latitude3 = aircraft.parent_node.GetTransform().GetPos().x
-            self.gps_longitude3 = aircraft.parent_node.GetTransform().GetPos().y
+            self.gps_longitude3 = aircraft.parent_node.GetTransform().GetPos().z
             self.gps_altitude3 = aircraft.get_altitude()
             self.linear_speed3 = aircraft.get_linear_speed() * 3.6
             self.gyro3 = aircraft.parent_node.GetTransform().GetRot()
+            pub.sendMessage('sensor_data3', message={'latitude3': self.gps_latitude3, 'longitude3': self.gps_longitude3, 'altitude3': self.gps_altitude3,
+                                            'linear_speed3': self.linear_speed3,'gyro3' : self.gyro3, })
+        else:
+            pass
 
-            
-
-
-
-        # if aircraft.id == 6:
-        #     self.mius1 = aircraft
-        # if aircraft.id == 7: 
-        #     self.mius2 = aircraft
-        # if aircraft.id == 8: 
-        #     self.mius3 = aircraft
-
-        # if 'self.mius1' not in locals():
-        #     print("mius1 değişkeni tanımlı değil veya None.")
-        # else:
-        #     self.gps_latitude1 = self.mius1.parent_node.GetTransform().GetPos().x
-        #     self.gps_longitude1 = self.mius1.parent_node.GetTransform().GetPos().y
-        #     self.gps_altitude1 = self.mius1.get_altitude()
-        #     self.linear_speed1 = self.mius1.get_linear_speed() * 3.6
-        #     print(self.linear_speed1)
-
-        # if 'self.mius2' not in locals():
-        #     print("mius2 değişkeni tanımlı değil veya None.")
-        # else:
-        #     self.gps_latitude2 = self.mius2.parent_node.GetTransform().GetPos().x
-        #     self.gps_longitude2 = self.mius2.parent_node.GetTransform().GetPos().y
-        #     self.gps_altitude2 = self.mius2.get_altitude()
-        #     self.linear_speed2 = self.mius2.get_linear_speed() * 3.6
-
-        # if 'self.mius3' not in locals():
-        #     print("mius3 değişkeni tanımlı değil veya None.")
-        # else:
-        #     self.gps_latitude3 = self.mius3.parent_node.GetTransform().GetPos().x
-        #     self.gps_longitude3 = self.mius3.parent_node.GetTransform().GetPos().y
-        #     self.gps_altitude3 = self.mius3.get_altitude()
-        #     self.linear_speed3 = self.mius3.get_linear_speed() * 3.6
-
-        pub.sendMessage('gps_data', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
-                                            'latitude2': self.gps_latitude2, 'longitude2': self.gps_longitude2, 'altitude2': self.gps_altitude2,
-                                            'latitude3': self.gps_latitude3, 'longitude3': self.gps_longitude3, 'altitude3': self.gps_altitude3,
-                                            'linear_speed1': self.linear_speed1, 'linear_speed2': self.linear_speed2, 'linear_speed3': self.linear_speed3,
-                                            'gyro1' : self.gyro1, 'gyro2' : self.gyro1, 'gyro3' : self.gyro1})
-
-
-        #return gps_latitude, gps_longitude, gps_altitude
-
-
-
-    def gps_data_handler(self, message):
+    def data_handler1(self, message):
             self.latitude1 = message['latitude1']
             self.longitude1 = message['longitude1']
             self.altitude1 = message['altitude1']
             self.linear_speed1 = message['linear_speed1']
             # self.gyro1 = message['gyro1']
-
-
-            self.latitude2 = message['latitude2']
-            self.longitude2 = message['longitude2']
-            self.altitude2 = message['altitude2']
-            self.linear_speed2 = message['linear_speed2']
-            # self.gyro1 = message['gyro2']
-
-
-            self.latitude3 = message['latitude3']
-            self.longitude3 = message['longitude3']
-            self.altitude3 = message['altitude3']
-            self.linear_speed3 = message['linear_speed3']
-            # self.gyro1 = message['gyro3']
-
-
 
             json_data = {
                 'latitude1': self.latitude1,
@@ -2000,23 +1958,49 @@ class AircraftIAControlDevice(ControlDevice):
                 'altitude1': self.altitude1,
                 'linear_speed1':self.linear_speed1,
                 # 'gyro1':self.gyro1,
+            }
 
+            data1 = json.dumps(json_data).encode('utf-8')
+            #print(type(data))
+            self.server.send_to_port1(data1)
+
+    def data_handler2(self, message):
+            self.latitude2 = message['latitude2']
+            self.longitude2 = message['longitude2']
+            self.altitude2 = message['altitude2']
+            self.linear_speed2 = message['linear_speed2']
+            # self.gyro2 = message['gyro2']
+
+            json_data = {
                 'latitude2': self.latitude2,
                 'longitude2': self.longitude2,
                 'altitude2': self.altitude2,
                 'linear_speed2':self.linear_speed2,
                 # 'gyro2':self.gyro2,
+            }
 
+            data2 = json.dumps(json_data).encode('utf-8')
+            #print(type(data))
+            self.server.send_to_port2(data2)
+
+    def data_handler3(self, message):
+            self.latitude3 = message['latitude3']
+            self.longitude3 = message['longitude3']
+            self.altitude3 = message['altitude3']
+            self.linear_speed3 = message['linear_speed3']
+            # self.gyro3 = message['gyro3']
+
+            json_data = {
                 'latitude3': self.latitude3,
                 'longitude3': self.longitude3,
                 'altitude3': self.altitude3,
                 'linear_speed3':self.linear_speed3,
-                # 'gyro3':self.gyro3
+                # 'gyro3':self.gyro3,
             }
 
-            data = json.dumps(json_data).encode('utf-8')
+            data3 = json.dumps(json_data).encode('utf-8')
             #print(type(data))
-            self.server.send(data)
+            self.server.send_to_port3(data3)
 
     # =============================== Keyboard commands ====================================
 
