@@ -1,2 +1,5 @@
 tqdm
 harfang==3.2.5
+flask
+pypubsub
+pyproj
