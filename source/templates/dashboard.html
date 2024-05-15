@@ -99,10 +99,10 @@
             <p><strong>Latitude:</strong> <span id="lat1">-</span></p>
             <p><strong>Longitude:</strong> <span id="long1">-</span></p>
             <p><strong>Altitude:</strong> <span id="alt1">-</span></p>
-            <p><strong>IMU:</strong> <span id="imu1">-</span></p>
+            <p><strong>Lidar Range:</strong> <span id="range1">-</span></p>
             <p><strong>Gyro:</strong> <span id="gyro1">-</span></p>
             <p><strong>Linear Speed:</strong> <span id="v_speed1">-</span></p>
-            <p><strong>Ground Speed:</strong> <span id="g_speed1">-</span></p>
+            <p><strong>Yaw Rate:</strong> <span id="yaw1">-</span></p>
             <p><strong>Heading:</strong> <span id="heading1">-</span></p>
         </div>
         <div class="aircraft">
@@ -110,10 +110,10 @@
             <p><strong>Latitude:</strong> <span id="lat2">-</span></p>
             <p><strong>Longitude:</strong> <span id="long2">-</span></p>
             <p><strong>Altitude:</strong> <span id="alt2">-</span></p>
-            <p><strong>IMU:</strong> <span id="imu2">-</span></p>
+            <p><strong>Lidar Range:</strong> <span id="range2">-</span></p>
             <p><strong>Gyro:</strong> <span id="gyro2">-</span></p>
             <p><strong>Linear Speed:</strong> <span id="v_speed2">-</span></p>
-            <p><strong>Ground Speed:</strong> <span id="g_speed2">-</span></p>
+            <p><strong>Yaw Rate:</strong> <span id="yaw2">-</span></p>
             <p><strong>Heading:</strong> <span id="heading2">-</span></p>
         </div>
         <div class="aircraft">
@@ -121,10 +121,10 @@
             <p><strong>Latitude:</strong> <span id="lat3">-</span></p>
             <p><strong>Longitude:</strong> <span id="long3">-</span></p>
             <p><strong>Altitude:</strong> <span id="alt3">-</span></p>
-            <p><strong>IMU:</strong> <span id="imu3">-</span></p>
+            <p><strong>Lidar Range:</strong> <span id="range3">-</span></p>
             <p><strong>Gyro:</strong> <span id="gyro3">-</span></p>
             <p><strong>Linear Speed:</strong> <span id="v_speed3">-</span></p>
-            <p><strong>Ground Speed:</strong> <span id="g_speed3">-</span></p>
+            <p><strong>Yaw Rate:</strong> <span id="yaw3">-</span></p>
             <p><strong>Heading:</strong> <span id="heading3">-</span></p>
         </div>
     </div>
@@ -186,6 +186,9 @@
                     document.getElementById("alt1").innerText = obj.altitude1;
                     document.getElementById("v_speed1").innerText = obj.linear_speed1;
                     document.getElementById("gyro1").innerText = obj.gyro1;
+                    document.getElementById("heading1").innerText = obj.heading1;
+                    document.getElementById("range1").innerText = obj.lidar_range1;
+                    document.getElementById("theta1").innerText = obj.lidar_theta1;
 
                 }
             });
@@ -203,6 +206,9 @@
                     document.getElementById("alt2").innerText = obj.altitude2;
                     document.getElementById("v_speed2").innerText = obj.linear_speed2;
                     document.getElementById("gyro2").innerText = obj.gyro2;
+                    document.getElementById("heading2").innerText = obj.heading2;
+                    document.getElementById("range2").innerText = obj.lidar_range2;
+                    document.getElementById("theta2").innerText = obj.lidar_theta2;
 
                 }
             });
@@ -220,6 +226,9 @@
                     document.getElementById("alt3").innerText = obj.altitude3;
                     document.getElementById("v_speed3").innerText = obj.linear_speed3;
                     document.getElementById("gyro3").innerText = obj.gyro3;
+                    document.getElementById("heading3").innerText = obj.heading3;
+                    document.getElementById("range3").innerText = obj.lidar_range3;
+                    document.getElementById("theta3").innerText = obj.lidar_theta3;
 
                 }
             });
