@@ -9,10 +9,12 @@ import data_converter as dc
 import numpy as np
 import math
 from pubsub import pub
-from flask import Flask, render_template
-import socket
 from udpserver import UdpSocket
-import threading
+from pyproj import Transformer
+
+
+
+
 
 
 
@@ -1430,6 +1432,10 @@ class AircraftIAControlDevice(ControlDevice):
         pub.subscribe(self.data_handler1, 'sensor_data1')
         pub.subscribe(self.data_handler2, 'sensor_data2')
         pub.subscribe(self.data_handler3, 'sensor_data3')
+        
+        self.transformer = Transformer.from_crs("epsg:32630", "epsg:4326")
+
+
 
         #self.initialize_socket()
 
@@ -1909,9 +1915,10 @@ class AircraftIAControlDevice(ControlDevice):
     def sensor_aircraft1(self, aircraft, dts):
 
         if aircraft.id == 6:
-            self.gps_latitude1 = aircraft.parent_node.GetTransform().GetPos().x
-            self.gps_longitude1 = aircraft.parent_node.GetTransform().GetPos().z
-            self.gps_altitude1 = aircraft.get_altitude()
+            self.gps_longitude1, self.gps_latitude1, self.gps_altitude1 = self.transformer.transform(aircraft.parent_node.GetTransform().GetPos().x,
+                                                                                           aircraft.parent_node.GetTransform().GetPos().z,
+                                                                                           aircraft.parent_node.GetTransform().GetPos().y)
+
             self.linear_speed1 = aircraft.get_linear_speed() * 3.6
             self.gyro1 = aircraft.parent_node.GetTransform().GetRot()
             pub.sendMessage('sensor_data1', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
@@ -1922,9 +1929,10 @@ class AircraftIAControlDevice(ControlDevice):
     def sensor_aircraft2(self, aircraft, dts):
 
         if aircraft.id == 7:
-            self.gps_latitude2 = aircraft.parent_node.GetTransform().GetPos().x
-            self.gps_longitude2 = aircraft.parent_node.GetTransform().GetPos().z
-            self.gps_altitude2 = aircraft.get_altitude()
+            self.gps_longitude2, self.gps_latitude2, self.gps_altitude2 = self.transformer.transform(aircraft.parent_node.GetTransform().GetPos().x,
+                                                                                           aircraft.parent_node.GetTransform().GetPos().z,
+                                                                                           aircraft.parent_node.GetTransform().GetPos().y)
+            
             self.linear_speed2 = aircraft.get_linear_speed() * 3.6
             self.gyro2 = aircraft.parent_node.GetTransform().GetRot()
             pub.sendMessage('sensor_data2', message={'latitude2': self.gps_latitude2, 'longitude2': self.gps_longitude2, 'altitude2': self.gps_altitude2,
@@ -1935,9 +1943,10 @@ class AircraftIAControlDevice(ControlDevice):
     def sensor_aircraft3(self, aircraft, dts):
 
         if aircraft.id == 8:
-            self.gps_latitude3 = aircraft.parent_node.GetTransform().GetPos().x
-            self.gps_longitude3 = aircraft.parent_node.GetTransform().GetPos().z
-            self.gps_altitude3 = aircraft.get_altitude()
+            self.gps_longitude3, self.gps_latitude3, self.gps_altitude3 = self.transformer.transform(aircraft.parent_node.GetTransform().GetPos().x,
+                                                                                           aircraft.parent_node.GetTransform().GetPos().z,
+                                                                                           aircraft.parent_node.GetTransform().GetPos().y)
+            
             self.linear_speed3 = aircraft.get_linear_speed() * 3.6
             self.gyro3 = aircraft.parent_node.GetTransform().GetRot()
             pub.sendMessage('sensor_data3', message={'latitude3': self.gps_latitude3, 'longitude3': self.gps_longitude3, 'altitude3': self.gps_altitude3,
