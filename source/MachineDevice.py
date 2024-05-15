@@ -1439,7 +1439,11 @@ class AircraftIAControlDevice(ControlDevice):
         pub.subscribe(self.data_handler1, 'sensor_data1')
         pub.subscribe(self.data_handler2, 'sensor_data2')
         pub.subscribe(self.data_handler3, 'sensor_data3')
-        
+
+        self.target_y = 0
+        self.target_x = 0
+        self.target_z = 0
+
         self.transformer = Transformer.from_crs("epsg:32630", "epsg:4326")
 
         self.server = UdpSocket()
@@ -1783,7 +1787,7 @@ class AircraftIAControlDevice(ControlDevice):
                         if aircraft.id == 6:  
                             ally_pos = aircraft.parent_node.GetTransform().GetPos()
                             target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
-                            left_target_pos = hg.Vec3(target_pos.x , target_pos.y, target_pos.z -100)  
+                            left_target_pos = hg.Vec3(target_pos.x +500 , target_pos.y, target_pos.z)  
                             vector_x = left_target_pos.x - ally_pos.x
                             vector_z = left_target_pos.z - ally_pos.z
                             heading_radians = np.arctan2(vector_x, vector_z)
@@ -1830,7 +1834,7 @@ class AircraftIAControlDevice(ControlDevice):
                         elif aircraft.id == 8:  
                             ally_pos = aircraft.parent_node.GetTransform().GetPos()
                             target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
-                            back_target_pos = hg.Vec3(target_pos.x , target_pos.y, target_pos.z +100 )  
+                            back_target_pos = hg.Vec3(target_pos.x-500 , target_pos.y, target_pos.z)  
                             vector_x = back_target_pos.x - ally_pos.x
                             vector_z = back_target_pos.z - ally_pos.z
                             heading_radians = np.arctan2(vector_x, vector_z)
@@ -1924,15 +1928,24 @@ class AircraftIAControlDevice(ControlDevice):
 
             self.linear_speed1 = aircraft.get_linear_speed() * 3.6
 
-            self.gyro1 = aircraft.parent_node.GetTransform().GetRot()
+            self.gyro1 = aircraft.parent_node.GetTransform().GetRot().z
 
             self.heading1 = aircraft.get_heading()
             self.lidar_range1, self.lidar_theta1 = self.calculate_lidar_measurement(aircraft,dts)
 
+            td = aircraft.get_device("TargettingDevice")
+            target_pos = td.targets[td.target_id - 1].get_parent_node().GetTransform().GetPos()
+
+            self.target_x = target_pos.x
+            self.target_y = target_pos.y
+            self.target_z = target_pos.z
+            print(self.target_x)
+            #self.target_speed = td.aircraft.get_linear_speed() * 3.6
 
             pub.sendMessage('sensor_data1', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
                                                 'linear_speed1': self.linear_speed1, 'gyro1' : self.gyro1, 'heading1':self.heading1, 'lidar_theta1':self.lidar_theta1,
-                                                 'lidar_range1':self.lidar_range1 })
+                                                 'lidar_range1':self.lidar_range1, 'target_x':self.target_x,'target_y':self.target_y,'target_z':self.target_z
+                                                  })
         else:
             pass
         
@@ -1945,7 +1958,7 @@ class AircraftIAControlDevice(ControlDevice):
 
             self.linear_speed2 = aircraft.get_linear_speed() * 3.6
 
-            self.gyro2 = aircraft.parent_node.GetTransform().GetRot()
+            self.gyro2 = aircraft.parent_node.GetTransform().GetRot().z
 
             self.heading2 = aircraft.get_heading()
             self.lidar_range2, self.lidar_theta2 = self.calculate_lidar_measurement(aircraft,dts)
@@ -1966,7 +1979,7 @@ class AircraftIAControlDevice(ControlDevice):
 
             self.linear_speed3 = aircraft.get_linear_speed() * 3.6
 
-            self.gyro3 = aircraft.parent_node.GetTransform().GetRot()
+            self.gyro3 = aircraft.parent_node.GetTransform().GetRot().z
 
             self.heading3 = aircraft.get_heading()
             self.lidar_range3, self.lidar_theta3 = self.calculate_lidar_measurement(aircraft,dts)
@@ -1983,24 +1996,31 @@ class AircraftIAControlDevice(ControlDevice):
             self.longitude1 = message['longitude1']
             self.altitude1 = message['altitude1']
             self.linear_speed1 = message['linear_speed1']
-            # self.gyro1 = message['gyro1']
+            self.gyro1 = message['gyro1']
             self.heading1 = message['heading1']
             self.lidar_range1 = message['lidar_range1']
             self.lidar_theta1 = message['lidar_theta1']
+            self.target_x = message['target_x']
+            self.target_y = message['target_y']
+            self.target_z = message['target_z']
+            # self.target_speed = message['target_speed']
 
             json_data = {
                 'latitude1': self.latitude1,
                 'longitude1': self.longitude1,
                 'altitude1': self.altitude1,
                 'linear_speed1':self.linear_speed1,
-                # 'gyro1':self.gyro1,
+                'gyro1':self.gyro1,
                 'heading1':self.heading1,
                 'lidar_range1':self.lidar_range1,
-                'lidar_theta1':self.lidar_theta1
+                'lidar_theta1':self.lidar_theta1,
+                'target_x':self.target_x,
+                'target_y':self.target_y,
+                'target_z':self.target_z,
+                # 'target_speed':self.target_speed
             }
 
             data1 = json.dumps(json_data).encode('utf-8')
-            #print(type(data))
             self.server.send_to_port1(data1)
 
     def data_handler2(self, message):
@@ -2008,7 +2028,7 @@ class AircraftIAControlDevice(ControlDevice):
             self.longitude2 = message['longitude2']
             self.altitude2 = message['altitude2']
             self.linear_speed2 = message['linear_speed2']
-            # self.gyro2 = message['gyro2']
+            self.gyro2 = message['gyro2']
             self.heading2 = message['heading2']
             self.lidar_range2 = message['lidar_range2']
             self.lidar_theta2 = message['lidar_theta2']
@@ -2018,14 +2038,13 @@ class AircraftIAControlDevice(ControlDevice):
                 'longitude2': self.longitude2,
                 'altitude2': self.altitude2,
                 'linear_speed2':self.linear_speed2,
-                # 'gyro2':self.gyro2,
+                'gyro2':self.gyro2,
                 'heading2':self.heading2,
                 'lidar_range2':self.lidar_range2,
                 'lidar_theta2':self.lidar_theta2
             }
 
             data2 = json.dumps(json_data).encode('utf-8')
-            #print(type(data))
             self.server.send_to_port2(data2)
 
     def data_handler3(self, message):
@@ -2033,7 +2052,7 @@ class AircraftIAControlDevice(ControlDevice):
             self.longitude3 = message['longitude3']
             self.altitude3 = message['altitude3']
             self.linear_speed3 = message['linear_speed3']
-            # self.gyro3 = message['gyro3']
+            self.gyro3 = message['gyro3']
             self.heading3 = message['heading3']
             self.lidar_range3 = message['lidar_range3']
             self.lidar_theta3 = message['lidar_theta3']
@@ -2043,14 +2062,13 @@ class AircraftIAControlDevice(ControlDevice):
                 'longitude3': self.longitude3,
                 'altitude3': self.altitude3,
                 'linear_speed3':self.linear_speed3,
-                # 'gyro3':self.gyro3,
+                'gyro3':self.gyro3,
                 'heading3':self.heading3,
                 'lidar_range3':self.lidar_range3,
                 'lidar_theta3':self.lidar_theta3
             }
 
             data3 = json.dumps(json_data).encode('utf-8')
-            #print(type(data))
             self.server.send_to_port3(data3)
 
     # =============================== Keyboard commands ====================================
