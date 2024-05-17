@@ -39,9 +39,9 @@ The startup screen looks like this:
     ```sh
     python3.10.exe .\client_sample.py
     ```
-6. Run the dashboard python script named as "client_sample.py".
+6. Run the dashboard python script named as "server.py".
     ```sh
-    python3.10.exe .\client_sample.py
+    python3.10.exe .\server.py
     ```
 
 7. To open dashboard go to URL:127.0.0.1/8181 with any browser.
