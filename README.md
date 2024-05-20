@@ -18,6 +18,7 @@ The research subject of the project is to jointly use the sensor data of many un
 - tqdm
 - pyproj
 - pypubsub
+- filterpy
 
 ### Installation
 
