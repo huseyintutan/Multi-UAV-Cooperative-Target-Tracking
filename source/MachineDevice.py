@@ -11,7 +11,7 @@ import math
 from pubsub import pub
 from udpserver import UdpSocket
 from pyproj import Transformer
-
+from source.ekf_module import AircraftKalmanFilter
 
 
 
@@ -1444,6 +1444,8 @@ class AircraftIAControlDevice(ControlDevice):
         self.target_x = 0
         self.target_z = 0
 
+
+
         self.transformer = Transformer.from_crs("epsg:32630", "epsg:4326")
 
         self.server = UdpSocket()
@@ -1928,7 +1930,10 @@ class AircraftIAControlDevice(ControlDevice):
 
             self.linear_speed1 = aircraft.get_linear_speed() * 3.6
 
-            self.gyro1 = aircraft.parent_node.GetTransform().GetRot().z
+            self.gyro1a = aircraft.parent_node.GetTransform().GetRot().x
+            self.gyro1b = aircraft.parent_node.GetTransform().GetRot().y
+            self.gyro1c = aircraft.parent_node.GetTransform().GetRot().z
+
 
             self.heading1 = aircraft.get_heading()
             self.lidar_range1, self.lidar_theta1 = self.calculate_lidar_measurement(aircraft,dts)
@@ -1939,12 +1944,11 @@ class AircraftIAControlDevice(ControlDevice):
             self.target_x = target_pos.x
             self.target_y = target_pos.y
             self.target_z = target_pos.z
-            print(self.target_x)
-            #self.target_speed = td.aircraft.get_linear_speed() * 3.6
 
             pub.sendMessage('sensor_data1', message={'latitude1': self.gps_latitude1, 'longitude1': self.gps_longitude1, 'altitude1': self.gps_altitude1,
-                                                'linear_speed1': self.linear_speed1, 'gyro1' : self.gyro1, 'heading1':self.heading1, 'lidar_theta1':self.lidar_theta1,
-                                                 'lidar_range1':self.lidar_range1, 'target_x':self.target_x,'target_y':self.target_y,'target_z':self.target_z
+                                                'linear_speed1': self.linear_speed1, 'heading1':self.heading1, 'lidar_theta1':self.lidar_theta1,
+                                                 'lidar_range1':self.lidar_range1, 'target_x':self.target_x,'target_y':self.target_y,'target_z':self.target_z,
+                                                 'gyro1a': self.gyro1a, 'gyro1b': self.gyro1b, 'gyro1c': self.gyro1c
                                                   })
         else:
             pass
@@ -1996,7 +2000,9 @@ class AircraftIAControlDevice(ControlDevice):
             self.longitude1 = message['longitude1']
             self.altitude1 = message['altitude1']
             self.linear_speed1 = message['linear_speed1']
-            self.gyro1 = message['gyro1']
+            self.gyro1a = message['gyro1a']
+            self.gyro1b = message['gyro1b']
+            self.gyro1c = message['gyro1c']
             self.heading1 = message['heading1']
             self.lidar_range1 = message['lidar_range1']
             self.lidar_theta1 = message['lidar_theta1']
@@ -2010,7 +2016,7 @@ class AircraftIAControlDevice(ControlDevice):
                 'longitude1': self.longitude1,
                 'altitude1': self.altitude1,
                 'linear_speed1':self.linear_speed1,
-                'gyro1':self.gyro1,
+                'gyro1':self.gyro1a,
                 'heading1':self.heading1,
                 'lidar_range1':self.lidar_range1,
                 'lidar_theta1':self.lidar_theta1,
@@ -2022,6 +2028,9 @@ class AircraftIAControlDevice(ControlDevice):
 
             data1 = json.dumps(json_data).encode('utf-8')
             self.server.send_to_port1(data1)
+            measurements  = [self.latitude1,self.longitude1,self.altitude1,self.gyro1a,self.gyro1b,self.gyro1c]
+            # filtered_state = self.kalman_filter_instance.extended_kalman_filter(data)
+
 
     def data_handler2(self, message):
             self.latitude2 = message['latitude2']
@@ -2070,6 +2079,7 @@ class AircraftIAControlDevice(ControlDevice):
 
             data3 = json.dumps(json_data).encode('utf-8')
             self.server.send_to_port3(data3)
+
 
     # =============================== Keyboard commands ====================================
 
